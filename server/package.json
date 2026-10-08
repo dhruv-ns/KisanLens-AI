@@ -1,0 +1,14 @@
+{
+  "name": "kisanlens-api",
+  "version": "1.0.0",
+  "description": "KisanLens AI - Backend API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Tests placeholder\" && exit 0"
+  },
+  "keywords": ["agriculture", "ai", "farming"],
+  "author": "KisanLens",
+  "license": "MIT"
+}

@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-300: #86efac;
+  --color-primary-400: #4ade80;
+  --color-primary-500: #22c55e;
+  --color-primary-600: #16a34a;
+  --color-primary-700: #15803d;
+  --color-primary-800: #166534;
+  --color-primary-900: #14532d;
+  --color-primary-950: #052e16;
+  
+  --color-amber-50: #fffbeb;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  
+  --color-danger-50: #fef2f2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  
+  --color-surface: #fafaf9;
+  --color-surface-card: #ffffff;
+  --color-surface-muted: #f5f5f4;
+  --color-text-primary: #1c1917;
+  --color-text-secondary: #57534e;
+  --color-text-muted: #a8a29e;
+  --color-border: #e7e5e4;
+  
+  --font-family-sans: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Severity badges */
+.severity-healthy { background-color: #dcfce7; color: #166534; }
+.severity-low { background-color: #fef9c3; color: #854d0e; }
+.severity-moderate { background-color: #fed7aa; color: #9a3412; }
+.severity-high { background-color: #fecaca; color: #991b1b; }
+.severity-unknown { background-color: #e5e7eb; color: #374151; }
+
+/* Status badges */
+.status-good { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.status-caution { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.status-postpone { background-color: #fed7aa; color: #9a3412; border: 1px solid #fdba74; }
+.status-avoid { background-color: #fecaca; color: #991b1b; border: 1px solid #fca5a5; }
+.status-urgent { background-color: #fecaca; color: #991b1b; border: 1px solid #fca5a5; }
+.status-attention { background-color: #fed7aa; color: #9a3412; border: 1px solid #fdba74; }
+.status-info { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.status-monitor { background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+.status-normal { background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+.status-recommended { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+
+/* Loading skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Pulse animation for recording */
+@keyframes pulse-record {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-record {
+  animation: pulse-record 1s ease-in-out infinite;
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+
+/* Bottom nav safe area */
+.pb-safe { padding-bottom: max(env(safe-area-inset-bottom, 0px), 80px); }

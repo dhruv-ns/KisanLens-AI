@@ -1,0 +1,173 @@
+{
+  "app": {
+    "name": "KisanLens AI",
+    "tagline": "AI-Powered Intelligence for Smarter Farming"
+  },
+  "nav": {
+    "home": "Home",
+    "crop": "Crop Scanner",
+    "weather": "Weather",
+    "market": "Market",
+    "assistant": "Assistant",
+    "history": "History",
+    "farm": "My Farm",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "greeting": "Good",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "yourFarm": "Your Farm",
+    "todaysActions": "Today's Farm Actions",
+    "cropHealth": "Crop Health",
+    "marketSnapshot": "Market Snapshot",
+    "aiAssistant": "AI Assistant",
+    "recentScan": "Recent Scan",
+    "noFarm": "Set up your farm profile to get personalized recommendations",
+    "setupFarm": "Setup Farm",
+    "quickActions": "Quick Actions",
+    "scanCrop": "Scan Crop",
+    "checkWeather": "Check Weather",
+    "viewMarket": "View Market",
+    "askAI": "Ask AI"
+  },
+  "scanner": {
+    "title": "AI Crop Scanner",
+    "subtitle": "Upload a crop image for AI-powered health analysis",
+    "selectCrop": "Select Crop",
+    "uploadImage": "Upload Image",
+    "takePhoto": "Take Photo",
+    "chooseFile": "Choose from Gallery",
+    "analyze": "Analyze Crop",
+    "analyzing": "Analyzing...",
+    "dragDrop": "Drag and drop an image here",
+    "maxSize": "Maximum file size: 10MB",
+    "supportedFormats": "Supported: JPG, PNG, WEBP",
+    "preview": "Image Preview",
+    "changeImage": "Change Image",
+    "crops": {
+      "tomato": "Tomato",
+      "potato": "Potato",
+      "rice": "Rice",
+      "wheat": "Wheat",
+      "onion": "Onion",
+      "cotton": "Cotton",
+      "maize": "Maize",
+      "sugarcane": "Sugarcane",
+      "soybean": "Soybean",
+      "other": "Other"
+    }
+  },
+  "analysis": {
+    "title": "Crop Analysis Result",
+    "possibleIssue": "Possible Issue",
+    "confidence": "Confidence",
+    "severity": "Severity",
+    "observations": "Observations",
+    "recommendations": "Recommended Actions",
+    "expertAdvice": "Expert Advice",
+    "imageQuality": "Image Quality",
+    "disclaimer": "AI-assisted preliminary assessment. For serious crop damage or uncertain cases, consult a qualified agricultural expert.",
+    "newScan": "New Scan",
+    "viewHistory": "View History",
+    "severityLevels": {
+      "healthy": "Healthy",
+      "low": "Low Risk",
+      "moderate": "Moderate Risk",
+      "high": "High Risk",
+      "unknown": "Unknown"
+    }
+  },
+  "weather": {
+    "title": "Weather Intelligence",
+    "subtitle": "Weather-based farming recommendations",
+    "searchLocation": "Search city or village...",
+    "useMyLocation": "Use My Location",
+    "current": "Current Weather",
+    "hourly": "Hourly Forecast",
+    "daily": "7-Day Forecast",
+    "temperature": "Temperature",
+    "feelsLike": "Feels Like",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "rain": "Rain Probability",
+    "precipitation": "Precipitation",
+    "farmAdvisory": "Farm Advisory",
+    "unavailable": "Weather information is temporarily unavailable."
+  },
+  "market": {
+    "title": "Market Intelligence",
+    "subtitle": "Agricultural commodity prices and trends",
+    "selectCommodity": "Select Commodity",
+    "selectState": "Select State",
+    "modalPrice": "Modal Price",
+    "priceRange": "Price Range",
+    "trend": "Trend",
+    "perQuintal": "per Quintal",
+    "demoDisclaimer": "This is demonstration data for development purposes. It does not reflect actual market prices.",
+    "noData": "No market data available for this selection.",
+    "priceChart": "Price Chart",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days"
+  },
+  "assistant": {
+    "title": "AI Farming Assistant",
+    "subtitle": "Ask me anything about farming",
+    "placeholder": "Ask about crop health, weather, farming tips...",
+    "send": "Send",
+    "clear": "Clear Chat",
+    "thinking": "Thinking...",
+    "suggestedQuestions": [
+      "What should I do in my field today?",
+      "How to prevent leaf blight in tomatoes?",
+      "When is the best time to irrigate?",
+      "How to improve soil quality?"
+    ],
+    "voiceButton": "Voice Input",
+    "listening": "Listening...",
+    "voiceNotSupported": "Voice input is not supported in this browser."
+  },
+  "farm": {
+    "title": "Farm Profile",
+    "farmName": "Farm Name",
+    "farmerName": "Farmer Name",
+    "location": "Location",
+    "crop": "Current Crop",
+    "cropStage": "Crop Stage",
+    "area": "Farm Area",
+    "soilType": "Soil Type",
+    "save": "Save Profile",
+    "saving": "Saving...",
+    "saved": "Farm profile saved!",
+    "stages": {
+      "sowing": "Sowing",
+      "germination": "Germination",
+      "vegetative": "Vegetative",
+      "flowering": "Flowering",
+      "fruiting": "Fruiting",
+      "harvesting": "Harvesting",
+      "post-harvest": "Post Harvest"
+    }
+  },
+  "history": {
+    "title": "Crop Analysis History",
+    "empty": "No crop analyses yet. Start by scanning a crop image!",
+    "scanNow": "Scan Now"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "noData": "No data available"
+  },
+  "alerts": {
+    "weatherAlert": "Weather Alert",
+    "cropAlert": "Crop Alert",
+    "marketAlert": "Market Alert"
+  }
+}
