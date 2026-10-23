@@ -29,9 +29,18 @@ app.use(helmet({
 
 // CORS
 app.use(cors({
-  origin: config.isProduction
-    ? [config.client.url]
-    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      !config.isProduction ||
+      origin === config.client.url ||
+      origin.endsWith('.vercel.app') ||
+      ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'].includes(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -75,6 +84,24 @@ app.use((req, res, next) => {
     }
   });
   next();
+});
+
+// Root info endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'KisanLens AI Backend API',
+    message: 'Backend is active and running.',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      crops: '/api/crops',
+      yield: '/api/yield',
+      weather: '/api/weather',
+      market: '/api/market',
+      assistant: '/api/assistant',
+    },
+  });
 });
 
 // Health check
