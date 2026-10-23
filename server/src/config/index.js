@@ -14,7 +14,7 @@ const config = {
 
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
-    model: 'gemini-2.0-flash',
+    model: process.env.GEMINI_MODEL || 'gemini-3.5-flash',
   },
 
   weather: {
@@ -37,10 +37,10 @@ const config = {
     url: process.env.CLIENT_URL || 'http://localhost:5173',
   },
 
-  cloudinary: {
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
-    apiKey: process.env.CLOUDINARY_API_KEY || '',
-    apiSecret: process.env.CLOUDINARY_API_SECRET || '',
+  imagekit: {
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY || '',
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY || '',
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || '',
   },
 
   upload: {

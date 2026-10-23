@@ -10,6 +10,7 @@ export default function Navbar() {
   const navLinks = [
     { path: '/dashboard', label: t('nav.home') },
     { path: '/crop-scanner', label: t('nav.crop') },
+    { path: '/yield-prediction', label: t('nav.yield') },
     { path: '/weather', label: t('nav.weather') },
     { path: '/market', label: t('nav.market') },
     { path: '/assistant', label: t('nav.assistant') },

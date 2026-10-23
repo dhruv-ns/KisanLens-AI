@@ -31,7 +31,12 @@ coverage/
 uploads/
 temp/
 
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Python & Machine Learning
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.joblib
+*.zip
+server/data/dataset/

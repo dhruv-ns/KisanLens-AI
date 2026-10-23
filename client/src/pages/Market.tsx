@@ -128,7 +128,7 @@ export default function Market() {
                     <YAxis tick={{ fontSize: 11 }} domain={['auto', 'auto']} />
                     <Tooltip
                       contentStyle={{ borderRadius: 12, fontSize: 12 }}
-                      formatter={(value: number) => [`₹${value.toLocaleString()}`, t('market.modalPrice')]}
+                      formatter={(value: any) => [`₹${Number(value || 0).toLocaleString()}`, t('market.modalPrice')]}
                     />
                     <Line type="monotone" dataKey="price" stroke="#16a34a" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                   </LineChart>

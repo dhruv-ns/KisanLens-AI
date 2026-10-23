@@ -18,6 +18,7 @@ const marketRoutes = require('./routes/marketRoutes');
 const farmRoutes = require('./routes/farmRoutes');
 const assistantRoutes = require('./routes/assistantRoutes');
 const authRoutes = require('./routes/authRoutes');
+const yieldRoutes = require('./routes/yieldRoutes');
 
 const app = express();
 
@@ -95,6 +96,7 @@ app.use('/api/farm', farmRoutes);
 app.use('/api/assistant', assistantRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', authRoutes);
+app.use('/api/yield', yieldRoutes);
 
 // 404 handler
 app.use('/api/*path', (req, res) => {

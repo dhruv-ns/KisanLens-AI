@@ -13,6 +13,7 @@ const Assistant = lazy(() => import('./pages/Assistant'));
 const FarmProfile = lazy(() => import('./pages/FarmProfile'));
 const History = lazy(() => import('./pages/History'));
 const Settings = lazy(() => import('./pages/Settings'));
+const YieldPrediction = lazy(() => import('./pages/YieldPrediction'));
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/market" element={<Market />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/farm" element={<FarmProfile />} />
+          <Route path="/yield-prediction" element={<YieldPrediction />} />
           <Route path="/history" element={<History />} />
           <Route path="/settings" element={<Settings />} />
         </Route>

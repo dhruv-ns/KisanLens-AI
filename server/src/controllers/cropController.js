@@ -1,6 +1,7 @@
 const { analyzeCropImage } = require('../services/geminiService');
 const CropAnalysis = require('../models/CropAnalysis');
 const { isDBConnected } = require('../config/database');
+const { uploadToImageKit } = require('../utils/imagekit');
 const logger = require('../utils/logger');
 const fs = require('fs');
 
@@ -21,6 +22,18 @@ async function analyzeCrop(req, res, next) {
     // Call Gemini AI
     const analysis = await analyzeCropImage(imagePath, crop);
 
+    // Upload image to ImageKit
+    let imageUrl = `/uploads/${req.file.filename}`; // fallback
+    try {
+      const { url } = await uploadToImageKit(imagePath, req.file.filename, '/kisanlens/crops');
+      imageUrl = url;
+      logger.info(`Image uploaded to ImageKit: ${url}`);
+      // Clean up local temp file only when remote upload succeeded
+      try { fs.unlinkSync(imagePath); } catch (e) { /* ignore */ }
+    } catch (ikErr) {
+      logger.warn('ImageKit upload failed, keeping local file for fallback:', ikErr.message);
+    }
+
     // Save to database if connected
     let recordId = 'local_' + Date.now();
     if (isDBConnected()) {
@@ -28,7 +41,7 @@ async function analyzeCrop(req, res, next) {
         const record = new CropAnalysis({
           userId: req.userId || null,
           farmId: req.body.farmId || null,
-          imageUrl: `/uploads/${req.file.filename}`,
+          imageUrl,
           crop: analysis.crop,
           possibleIssue: analysis.possibleIssue,
           confidence: analysis.confidence,
@@ -53,7 +66,7 @@ async function analyzeCrop(req, res, next) {
       data: {
         id: recordId,
         ...analysis,
-        imageUrl: `/uploads/${req.file.filename}`,
+        imageUrl,
         disclaimer,
         analyzedAt: new Date().toISOString(),
       },

@@ -3,7 +3,44 @@ const fs = require('fs');
 const config = require('../config');
 const logger = require('../utils/logger');
 
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${config.gemini.model}:generateContent`;
+const CANDIDATE_MODELS = [
+  config.gemini.model || 'gemini-3.5-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-flash-latest',
+];
+
+/**
+ * Robust caller with automatic model fallback for timeouts, 503, 404, 429
+ */
+async function callGemini(payload, timeout = 15000) {
+  let lastError = null;
+
+  for (const model of CANDIDATE_MODELS) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.gemini.apiKey}`;
+    try {
+      const response = await axios.post(url, payload, { timeout });
+      return response.data;
+    } catch (err) {
+      lastError = err;
+      const status = err.response?.status;
+      const isTimeout = err.code === 'ECONNABORTED' || (err.message && err.message.toLowerCase().includes('timeout'));
+      const errMsg = err.response?.data?.error?.message || err.message;
+      
+      logger.warn(`Gemini model [${model}] failed (${status || (isTimeout ? 'TIMEOUT' : 'NETWORK')}): ${errMsg}`);
+
+      // If it's a client bad request (400), no model will accept it, so rethrow
+      if (status === 400) {
+        throw err;
+      }
+
+      // For timeouts, 503 high demand, 404 retired model, 429 rate limit, 500 server error:
+      // seamlessly try the next model candidate
+      continue;
+    }
+  }
+
+  throw lastError;
+}
 
 const CROP_ANALYSIS_PROMPT = `You are KisanLens AI, an agricultural decision-support assistant.
 
@@ -40,7 +77,7 @@ Rules:
 {
   "crop": "string",
   "possibleIssue": "string",
-  "confidence": number,
+  "confidence": 0,
   "severity": "healthy|low|moderate|high|unknown",
   "observations": ["string"],
   "recommendedActions": ["string"],
@@ -49,14 +86,18 @@ Rules:
   "additionalNotes": "string"
 }`;
 
-const ASSISTANT_PROMPT = `You are KisanLens AI, an agricultural decision-support assistant.
+const ASSISTANT_PROMPT = `You are KisanLens AI Assistant, a helpful, practical, bilingual agricultural advisor for Indian farmers.
 
-Help farmers understand crop health, weather, irrigation considerations, field activities, and market information.
+You help farmers with:
+- Crop health and disease management
+- Weather-based agricultural advice
+- Practical, low-cost farming solutions
+- Organic and chemical treatment options (with safety warnings)
+- Market timing and crop planning
+- General farming best practices
 
-You must:
-- Use simple language.
-- Support Hindi, English and Hinglish based on the user's message language.
-- Avoid definitive diagnoses.
+Rules:
+- Never give dangerous advice.
 - Avoid unsafe chemical instructions.
 - Never invent market prices.
 - Never invent weather information.
@@ -92,37 +133,35 @@ async function analyzeCropImage(imagePath, crop) {
   const prompt = CROP_ANALYSIS_PROMPT.replace('{{crop}}', crop || 'Unknown');
 
   try {
-    const response = await axios.post(
-      `${GEMINI_API_URL}?key=${config.gemini.apiKey}`,
-      {
-        contents: [
-          {
-            parts: [
-              { text: prompt },
-              {
-                inlineData: {
-                  mimeType,
-                  data: base64Image,
-                },
+    const data = await callGemini({
+      contents: [
+        {
+          parts: [
+            { text: prompt },
+            {
+              inlineData: {
+                mimeType,
+                data: base64Image,
               },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 2048,
-          responseMimeType: 'application/json',
+            },
+          ],
         },
+      ],
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 2048,
+        responseMimeType: 'application/json',
       },
-      { timeout: 30000 }
-    );
+    });
 
-    const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) {
       throw new Error('No response from AI model.');
     }
 
-    const parsed = JSON.parse(text);
+    // Clean potential markdown blocks
+    const cleanJson = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleanJson);
 
     // Validate and sanitize
     return {
@@ -145,8 +184,8 @@ async function analyzeCropImage(imagePath, crop) {
     if (error.response?.status >= 500) {
       throw new Error('AI analysis is temporarily unavailable. Please try again.');
     }
-    logger.error('Gemini API error:', error.message);
-    throw new Error(`AI analysis failed: ${error.message}`);
+    logger.error('Gemini API error:', error.response?.data?.error?.message || error.message);
+    throw new Error(`AI analysis failed: ${error.response?.data?.error?.message || error.message}`);
   }
 }
 
@@ -170,7 +209,6 @@ async function chatWithAssistant(question, context = {}) {
   // Build conversation history
   const contents = [];
   if (context.history && context.history.length > 0) {
-    // Add up to 10 recent messages for context
     const recentHistory = context.history.slice(-10);
     for (const msg of recentHistory) {
       contents.push({
@@ -187,24 +225,20 @@ async function chatWithAssistant(question, context = {}) {
   });
 
   try {
-    const response = await axios.post(
-      `${GEMINI_API_URL}?key=${config.gemini.apiKey}`,
-      {
-        contents,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1024,
-        },
+    const data = await callGemini({
+      contents,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
       },
-      { timeout: 30000 }
-    );
+    });
 
-    const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) throw new Error('No response from AI assistant.');
 
     return text;
   } catch (error) {
-    logger.error('Gemini assistant error:', error.message);
+    logger.error('Gemini assistant error:', error.response?.data?.error?.message || error.message);
     throw new Error('AI assistant is temporarily unavailable. Please try again.');
   }
 }

@@ -1,0 +1,1256 @@
+{
+  "dataset_info": {
+    "total_records": 28242,
+    "years": [
+      1990,
+      2013
+    ],
+    "crops_count": 10,
+    "countries_count": 101
+  },
+  "crops": [
+    "Cassava",
+    "Maize",
+    "Plantains and others",
+    "Potatoes",
+    "Rice, paddy",
+    "Sorghum",
+    "Soybeans",
+    "Sweet potatoes",
+    "Wheat",
+    "Yams"
+  ],
+  "countries": [
+    "Albania",
+    "Algeria",
+    "Angola",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Belarus",
+    "Belgium",
+    "Botswana",
+    "Brazil",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chile",
+    "Colombia",
+    "Croatia",
+    "Denmark",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Eritrea",
+    "Estonia",
+    "Finland",
+    "France",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Guatemala",
+    "Guinea",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "India",
+    "Indonesia",
+    "Iraq",
+    "Ireland",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Kazakhstan",
+    "Kenya",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Libya",
+    "Lithuania",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Mali",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Namibia",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Norway",
+    "Pakistan",
+    "Papua New Guinea",
+    "Peru",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Rwanda",
+    "Saudi Arabia",
+    "Senegal",
+    "Slovenia",
+    "South Africa",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Tajikistan",
+    "Thailand",
+    "Tunisia",
+    "Turkey",
+    "Uganda",
+    "Ukraine",
+    "United Kingdom",
+    "Uruguay",
+    "Zambia",
+    "Zimbabwe"
+  ],
+  "crop_stats": {
+    "Cassava": {
+      "mean_yield_hg_ha": 150479.47,
+      "median_yield_hg_ha": 128200.0,
+      "min_yield_hg_ha": 11778.0,
+      "max_yield_hg_ha": 385818.0,
+      "india_mean_yield_hg_ha": 282234.43,
+      "optimal_temperature": {
+        "min": 25.1,
+        "max": 27.1,
+        "ideal": 26.0
+      },
+      "optimal_rainfall": {
+        "min": 1083.0,
+        "max": 1083.0,
+        "ideal": 1083.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Maize": {
+      "mean_yield_hg_ha": 36310.07,
+      "median_yield_hg_ha": 25401.0,
+      "min_yield_hg_ha": 849.0,
+      "max_yield_hg_ha": 207556.0,
+      "india_mean_yield_hg_ha": 19305.91,
+      "optimal_temperature": {
+        "min": 7.7,
+        "max": 21.2,
+        "ideal": 12.4
+      },
+      "optimal_rainfall": {
+        "min": 534.0,
+        "max": 1522.0,
+        "ideal": 636.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Plantains and others": {
+      "mean_yield_hg_ha": 106041.32,
+      "median_yield_hg_ha": 89860.5,
+      "min_yield_hg_ha": 21350.0,
+      "max_yield_hg_ha": 418505.0,
+      "india_mean_yield_hg_ha": 106041.32,
+      "optimal_temperature": {
+        "min": 17.2,
+        "max": 27.3,
+        "ideal": 26.1
+      },
+      "optimal_rainfall": {
+        "min": 1410.0,
+        "max": 2331.0,
+        "ideal": 1976.0
+      },
+      "pesticide_median_tonnes": 1845.93
+    },
+    "Potatoes": {
+      "mean_yield_hg_ha": 199801.55,
+      "median_yield_hg_ha": 182271.0,
+      "min_yield_hg_ha": 8406.0,
+      "max_yield_hg_ha": 501412.0,
+      "india_mean_yield_hg_ha": 182060.3,
+      "optimal_temperature": {
+        "min": 9.1,
+        "max": 19.9,
+        "ideal": 14.2
+      },
+      "optimal_rainfall": {
+        "min": 534.0,
+        "max": 1668.0,
+        "ideal": 758.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Rice, paddy": {
+      "mean_yield_hg_ha": 40730.43,
+      "median_yield_hg_ha": 35878.0,
+      "min_yield_hg_ha": 2034.0,
+      "max_yield_hg_ha": 103895.0,
+      "india_mean_yield_hg_ha": 30295.74,
+      "optimal_temperature": {
+        "min": 12.3,
+        "max": 20.6,
+        "ideal": 16.8
+      },
+      "optimal_rainfall": {
+        "min": 534.0,
+        "max": 1668.0,
+        "ideal": 636.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Sorghum": {
+      "mean_yield_hg_ha": 18635.78,
+      "median_yield_hg_ha": 12885.0,
+      "min_yield_hg_ha": 578.0,
+      "max_yield_hg_ha": 206000.0,
+      "india_mean_yield_hg_ha": 8452.43,
+      "optimal_temperature": {
+        "min": 12.3,
+        "max": 22.6,
+        "ideal": 17.8
+      },
+      "optimal_rainfall": {
+        "min": 495.0,
+        "max": 1300.0,
+        "ideal": 758.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Soybeans": {
+      "mean_yield_hg_ha": 16731.09,
+      "median_yield_hg_ha": 15533.0,
+      "min_yield_hg_ha": 50.0,
+      "max_yield_hg_ha": 41609.0,
+      "india_mean_yield_hg_ha": 10354.91,
+      "optimal_temperature": {
+        "min": 8.1,
+        "max": 22.4,
+        "ideal": 17.1
+      },
+      "optimal_rainfall": {
+        "min": 537.0,
+        "max": 1761.0,
+        "ideal": 637.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Sweet potatoes": {
+      "mean_yield_hg_ha": 119057.79,
+      "median_yield_hg_ha": 99940.0,
+      "min_yield_hg_ha": 8799.0,
+      "max_yield_hg_ha": 400000.0,
+      "india_mean_yield_hg_ha": 87825.17,
+      "optimal_temperature": {
+        "min": 13.5,
+        "max": 22.7,
+        "ideal": 17.6
+      },
+      "optimal_rainfall": {
+        "min": 534.0,
+        "max": 1668.0,
+        "ideal": 758.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Wheat": {
+      "mean_yield_hg_ha": 30116.27,
+      "median_yield_hg_ha": 25497.0,
+      "min_yield_hg_ha": 1706.0,
+      "max_yield_hg_ha": 99387.0,
+      "india_mean_yield_hg_ha": 26546.83,
+      "optimal_temperature": {
+        "min": 8.3,
+        "max": 21.5,
+        "ideal": 11.5
+      },
+      "optimal_rainfall": {
+        "min": 589.0,
+        "max": 1485.0,
+        "ideal": 758.0
+      },
+      "pesticide_median_tonnes": 46195.0
+    },
+    "Yams": {
+      "mean_yield_hg_ha": 114140.35,
+      "median_yield_hg_ha": 92593.0,
+      "min_yield_hg_ha": 11475.0,
+      "max_yield_hg_ha": 250000.0,
+      "india_mean_yield_hg_ha": 114140.35,
+      "optimal_temperature": {
+        "min": 13.7,
+        "max": 27.1,
+        "ideal": 15.9
+      },
+      "optimal_rainfall": {
+        "min": 1668.0,
+        "max": 2051.0,
+        "ideal": 1668.0
+      },
+      "pesticide_median_tonnes": 18131.0
+    }
+  },
+  "historical_trends": {
+    "Cassava": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 119292.7
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 123852.8
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 126751.5
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 127019.6
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 130529.0
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 135052.1
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 127985.5
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 126310.4
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 135821.2
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 137388.7
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 145293.0
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 149279.8
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 150466.8
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 152541.3
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 159912.9
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 166888.9
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 166105.9
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 173298.7
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 177385.2
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 177228.0
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 180969.8
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 187967.2
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 183037.1
+      }
+    ],
+    "Maize": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 27706.0
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 27901.0
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 27963.0
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 28997.4
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 28344.6
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 29200.1
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 30763.5
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 31915.2
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 32526.0
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 33003.4
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 33590.6
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 34558.0
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 35371.1
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 39058.5
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 39693.5
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 39282.2
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 41819.9
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 43565.3
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 43156.5
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 45553.2
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 45769.2
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 45920.0
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 47145.3
+      }
+    ],
+    "Plantains and others": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 107239.2
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 108768.7
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 103993.3
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 105399.4
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 105555.8
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 108046.0
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 103516.7
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 103477.5
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 104212.6
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 105620.2
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 104746.8
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 105700.0
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 102276.2
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 106927.6
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 106305.9
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 102924.3
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 106365.3
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 104510.2
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 113246.2
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 104131.9
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 106512.2
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 109174.8
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 110061.4
+      }
+    ],
+    "Potatoes": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 173127.1
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 169009.0
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 171165.0
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 174366.8
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 175015.7
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 179542.6
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 183527.5
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 186404.4
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 182332.6
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 192202.3
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 194626.9
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 199096.8
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 206737.6
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 211965.7
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 210832.5
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 206952.0
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 214021.0
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 218294.4
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 221428.1
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 223711.7
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 232063.0
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 225577.9
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 234353.7
+      }
+    ],
+    "Rice, paddy": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 35196.4
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 35318.8
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 36385.0
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 35967.2
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 36654.1
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 37194.8
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 37111.8
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 37543.6
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 38264.7
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 39580.4
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 39049.6
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 40175.4
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 39299.1
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 41532.8
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 41525.6
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 43443.4
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 43032.2
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 44050.3
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 45326.6
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 45953.4
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 47581.9
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 47786.1
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 48261.2
+      }
+    ],
+    "Sorghum": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 16479.4
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 15901.8
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 17012.9
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 17001.8
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 15990.7
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 16079.6
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 17189.6
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 17356.5
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 17245.1
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 18476.6
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 18534.7
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 17842.4
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 17579.2
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 18949.3
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 18575.3
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 19133.5
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 18886.1
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 20287.6
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 21320.0
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 21965.6
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 22473.3
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 22804.0
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 20332.7
+      }
+    ],
+    "Soybeans": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 15466.7
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 15189.9
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 14983.5
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 15505.3
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 15700.3
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 15871.8
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 16157.8
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 16353.0
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 16604.8
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 17719.7
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 16252.1
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 16816.4
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 16915.9
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 16643.8
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 17400.8
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 17138.9
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 16882.7
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 17881.6
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 17059.4
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 17916.6
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 17754.4
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 18201.7
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 17989.1
+      }
+    ],
+    "Sweet potatoes": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 105421.8
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 105426.1
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 108816.8
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 106974.0
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 112619.0
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 109643.4
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 108298.8
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 113712.7
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 113724.4
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 114306.2
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 118682.1
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 119254.5
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 117810.3
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 124440.9
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 122463.0
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 120313.5
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 127342.3
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 125774.5
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 125629.9
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 129093.6
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 132829.9
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 134179.4
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 139882.5
+      }
+    ],
+    "Wheat": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 26774.1
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 27297.5
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 26524.0
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 26972.5
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 26786.0
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 27113.0
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 28308.8
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 28216.9
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 28712.6
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 28781.8
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 29916.7
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 29995.4
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 30231.4
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 31602.0
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 30912.3
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 30887.1
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 31101.8
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 33357.3
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 32504.3
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 32582.5
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 34285.9
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 33825.0
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 35204.4
+      }
+    ],
+    "Yams": [
+      {
+        "year": 1990,
+        "avg_yield_hg_ha": 102800.2
+      },
+      {
+        "year": 1991,
+        "avg_yield_hg_ha": 103059.1
+      },
+      {
+        "year": 1992,
+        "avg_yield_hg_ha": 102729.9
+      },
+      {
+        "year": 1993,
+        "avg_yield_hg_ha": 101499.5
+      },
+      {
+        "year": 1994,
+        "avg_yield_hg_ha": 106840.1
+      },
+      {
+        "year": 1995,
+        "avg_yield_hg_ha": 107747.8
+      },
+      {
+        "year": 1996,
+        "avg_yield_hg_ha": 106690.4
+      },
+      {
+        "year": 1997,
+        "avg_yield_hg_ha": 109758.5
+      },
+      {
+        "year": 1998,
+        "avg_yield_hg_ha": 108553.4
+      },
+      {
+        "year": 1999,
+        "avg_yield_hg_ha": 114722.6
+      },
+      {
+        "year": 2000,
+        "avg_yield_hg_ha": 118175.6
+      },
+      {
+        "year": 2001,
+        "avg_yield_hg_ha": 112874.3
+      },
+      {
+        "year": 2002,
+        "avg_yield_hg_ha": 113862.8
+      },
+      {
+        "year": 2004,
+        "avg_yield_hg_ha": 119684.2
+      },
+      {
+        "year": 2005,
+        "avg_yield_hg_ha": 118905.5
+      },
+      {
+        "year": 2006,
+        "avg_yield_hg_ha": 121788.8
+      },
+      {
+        "year": 2007,
+        "avg_yield_hg_ha": 121928.9
+      },
+      {
+        "year": 2008,
+        "avg_yield_hg_ha": 121021.6
+      },
+      {
+        "year": 2009,
+        "avg_yield_hg_ha": 120880.7
+      },
+      {
+        "year": 2010,
+        "avg_yield_hg_ha": 124828.8
+      },
+      {
+        "year": 2011,
+        "avg_yield_hg_ha": 122860.5
+      },
+      {
+        "year": 2012,
+        "avg_yield_hg_ha": 120183.3
+      },
+      {
+        "year": 2013,
+        "avg_yield_hg_ha": 121000.2
+      }
+    ]
+  },
+  "model_metrics": {
+    "algorithm": "RandomForestRegressor",
+    "r2_score": 0.9734,
+    "mae_hg_ha": 6208.34,
+    "test_size": 0.2
+  }
+}

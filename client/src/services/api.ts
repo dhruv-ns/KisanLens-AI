@@ -134,4 +134,42 @@ export const authApi = {
   },
 };
 
+// ====== CROP YIELD PREDICTION API ======
+export const yieldApi = {
+  getMetadata: async () => {
+    const res = await api.get('/yield/metadata');
+    return res.data;
+  },
+  predict: async (data: {
+    crop: string;
+    country?: string;
+    rainfall: number;
+    temperature: number;
+    pesticides?: number;
+    farmArea?: number;
+  }) => {
+    const res = await api.post('/yield/predict', data);
+    return res.data;
+  },
+  getRecommendations: async (params: {
+    country?: string;
+    rainfall: number;
+    temperature: number;
+    farmArea?: number;
+  }) => {
+    const query = new URLSearchParams({
+      country: params.country || 'India',
+      rainfall: params.rainfall.toString(),
+      temperature: params.temperature.toString(),
+      farmArea: (params.farmArea || 1).toString(),
+    });
+    const res = await api.get(`/yield/recommendations?${query}`);
+    return res.data;
+  },
+  getCropTrend: async (crop: string) => {
+    const res = await api.get(`/yield/trend/${encodeURIComponent(crop)}`);
+    return res.data;
+  },
+};
+
 export default api;
