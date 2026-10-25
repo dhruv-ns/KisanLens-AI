@@ -47,6 +47,8 @@
     "supportedFormats": "समर्थित: JPG, PNG, WEBP",
     "preview": "तस्वीर पूर्वावलोकन",
     "changeImage": "तस्वीर बदलें",
+    "reportLanguage": "रिपोर्ट की भाषा",
+    "reportLanguageDesc": "रोग निदान और उपचार सलाह के लिए क्षेत्रीय भाषा चुनें",
     "crops": {
       "tomato": "टमाटर",
       "potato": "आलू",
@@ -72,6 +74,9 @@
     "disclaimer": "AI-सहायित प्रारंभिक मूल्यांकन। गंभीर फसल क्षति या अनिश्चित मामलों के लिए, एक योग्य कृषि विशेषज्ञ से परामर्श करें।",
     "newScan": "नया स्कैन",
     "viewHistory": "इतिहास देखें",
+    "listenReport": "रिपोर्ट सुनें",
+    "stopAudio": "आवाज़ रोकें",
+    "playingAudio": "रिपोर्ट बोली जा रही है...",
     "severityLevels": {
       "healthy": "स्वस्थ",
       "low": "कम जोखिम",
@@ -127,7 +132,20 @@
     ],
     "voiceButton": "आवाज़ इनपुट",
     "listening": "सुन रहा है...",
-    "voiceNotSupported": "इस ब्राउज़र में आवाज़ इनपुट समर्थित नहीं है।"
+    "voiceNotSupported": "इस ब्राउज़र में आवाज़ इनपुट समर्थित नहीं है।",
+    "voiceTitle": "AI कृषि सहायक",
+    "voiceSubtitle": "हिंदी या English में बोलें या लिखें",
+    "youSaid": "आपने कहा",
+    "speakOrType": "माइक बटन दबाकर हिंदी में बोलें या नीचे टाइप करें",
+    "namaste": "नमस्ते! मैं आपका कृषि सहायक हूं",
+    "voiceLabel": "आवाज़ से",
+    "listenButton": "सुनें",
+    "stopButton": "रोकें",
+    "cancelRecording": "रद्द करें",
+    "autoPlayOn": "ऑटो-प्ले चालू",
+    "autoPlayOff": "ऑटो-प्ले बंद",
+    "voiceProcessingFailed": "आवाज़ प्रक्रिया में समस्या। कृपया फिर से बोलें।",
+    "typeHere": "हिंदी या English में टाइप करें..."
   },
   "farm": {
     "title": "खेत प्रोफ़ाइल",

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, Camera, History, AlertTriangle, CheckCircle, XCircle, Info, Shield } from 'lucide-react';
+import { ArrowLeft, Camera, History, AlertTriangle, CheckCircle, XCircle, Info, Shield, Volume2, Square, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { cropApi } from '../services/api';
+import { cropApi, voiceApi } from '../services/api';
 import { CardSkeleton } from '../components/LoadingSkeleton';
+import { useAudioPlayer } from '../hooks/useAudioPlayer';
 
 export default function CropAnalysisResult() {
   const { id } = useParams();
@@ -11,6 +12,11 @@ export default function CropAnalysisResult() {
   const { t } = useLanguage();
   const [analysis, setAnalysis] = useState<any>(location.state?.analysis || null);
   const [loading, setLoading] = useState(!analysis);
+  const [audioLoading, setAudioLoading] = useState(false);
+
+  const { play, stop, isPlaying, speakBrowser, stopBrowserSpeech, isBrowserSpeaking } = useAudioPlayer();
+
+  const isSpeaking = isPlaying || isBrowserSpeaking;
 
   useEffect(() => {
     if (!analysis && id) {
@@ -40,8 +46,32 @@ export default function CropAnalysisResult() {
 
   const sev = severityConfig[analysis.severity] || severityConfig.unknown;
   const SevIcon = sev.icon;
-
   const apiUrl = import.meta.env.VITE_API_URL || '';
+
+  const handleSpeakReport = async () => {
+    if (isSpeaking) {
+      stop();
+      stopBrowserSpeech();
+      return;
+    }
+
+    const obsText = Array.isArray(analysis.observations) ? analysis.observations.slice(0, 3).join('. ') : '';
+    const actText = Array.isArray(analysis.recommendedActions) ? analysis.recommendedActions.slice(0, 3).join('. ') : '';
+    const fullText = `${analysis.crop}। समस्या: ${analysis.possibleIssue}। मुख्य लक्षण: ${obsText}। उपचार: ${actText}। ${analysis.expertAttention || ''}`;
+
+    const langCode = analysis.language || 'hi-IN';
+
+    // Try Gnani Timbre TTS first with browser speech fallback
+    try {
+      setAudioLoading(true);
+      const audioBlob = await voiceApi.synthesize(fullText.slice(0, 1000), langCode);
+      setAudioLoading(false);
+      play(audioBlob, fullText, langCode.startsWith('hi') ? 'hi-IN' : langCode);
+    } catch {
+      setAudioLoading(false);
+      speakBrowser(fullText, langCode.startsWith('hi') ? 'hi-IN' : langCode);
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto space-y-4">
@@ -50,7 +80,37 @@ export default function CropAnalysisResult() {
         <ArrowLeft className="w-4 h-4" /> {t('common.back')}
       </Link>
 
-      <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">{t('analysis.title')}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">{t('analysis.title')}</h1>
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-xs font-semibold border border-primary-200">
+          <Sparkles className="w-3.5 h-3.5 text-primary-600" />
+          <span>{analysis.provider || 'Gnani AI'}</span>
+        </div>
+      </div>
+
+      {/* Voice Reader Button for Farmers */}
+      <button
+        type="button"
+        onClick={handleSpeakReport}
+        disabled={audioLoading}
+        className={`w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all cursor-pointer border ${
+          isSpeaking
+            ? 'bg-amber-600 text-white border-amber-600 shadow-md animate-pulse'
+            : 'bg-gradient-to-r from-primary-600 to-emerald-600 text-white border-transparent hover:from-primary-700 hover:to-emerald-700 shadow-md shadow-primary-100'
+        }`}
+      >
+        {isSpeaking ? (
+          <>
+            <Square className="w-4 h-4 fill-white" />
+            <span>{t('analysis.stopAudio')}</span>
+          </>
+        ) : (
+          <>
+            <Volume2 className="w-5 h-5" />
+            <span>{audioLoading ? t('analysis.playingAudio') : t('analysis.listenReport')}</span>
+          </>
+        )}
+      </button>
 
       {/* Image Preview */}
       {analysis.imageUrl && (
@@ -87,51 +147,51 @@ export default function CropAnalysisResult() {
         </div>
       </div>
 
-      {/* Observations */}
+      {/* Observations in Regional Language */}
       {analysis.observations?.length > 0 && (
         <div className="bg-white rounded-2xl p-5 border border-[var(--color-border)]">
           <h3 className="font-semibold mb-3 text-[var(--color-text-primary)]">{t('analysis.observations')}</h3>
           <ul className="space-y-2">
             {analysis.observations.map((obs: string, i: number) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 shrink-0" />
-                {obs}
+              <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary-500 mt-2 shrink-0" />
+                <span>{obs}</span>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Recommended Actions */}
+      {/* Recommended Actions in Regional Language */}
       {analysis.recommendedActions?.length > 0 && (
         <div className="bg-white rounded-2xl p-5 border border-[var(--color-border)]">
           <h3 className="font-semibold mb-3 text-[var(--color-text-primary)]">{t('analysis.recommendations')}</h3>
-          <ul className="space-y-2">
+          <ul className="space-y-2.5">
             {analysis.recommendedActions.map((action: string, i: number) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
-                <CheckCircle className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" />
-                {action}
+              <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                <CheckCircle className="w-4 h-4 text-primary-600 mt-1 shrink-0" />
+                <span>{action}</span>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Expert Advice */}
+      {/* Expert Advice in Regional Language */}
       {analysis.expertAttention && (
         <div className="bg-blue-50 rounded-2xl p-4 border border-blue-200 flex items-start gap-3">
           <Shield className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
           <div>
             <h4 className="font-semibold text-sm text-blue-800 mb-0.5">{t('analysis.expertAdvice')}</h4>
-            <p className="text-sm text-blue-700">{analysis.expertAttention}</p>
+            <p className="text-sm text-blue-700 leading-relaxed">{analysis.expertAttention}</p>
           </div>
         </div>
       )}
 
-      {/* Disclaimer */}
+      {/* Disclaimer in Regional Language */}
       <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200 flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
-        <p className="text-xs text-amber-700">{analysis.disclaimer || t('analysis.disclaimer')}</p>
+        <p className="text-xs text-amber-800 leading-relaxed">{analysis.disclaimer || t('analysis.disclaimer')}</p>
       </div>
 
       {/* Actions */}

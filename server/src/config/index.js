@@ -12,9 +12,17 @@ const config = {
     uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/kisanlens',
   },
 
+  // AI Configuration — 100% Gnani AI (Voice STT: Prisma v2.5, TTS: Timbre v2.5, LLM: Evon v3.3)
+  gnani: {
+    apiKey: process.env.GNANI_API_KEY || process.env.GEMINI_API_KEY || '',
+    evonEndpoint: process.env.GNANI_EVON_ENDPOINT || 'https://api.vachana.ai/v1/chat/completions',
+    evonEnabled: process.env.GNANI_EVON_ENABLED !== 'false', // Enabled by default
+  },
+
+  // Legacy reference (deprecated)
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
-    model: process.env.GEMINI_MODEL || 'gemini-3.5-flash',
+    model: process.env.GEMINI_MODEL || 'deprecated',
   },
 
   weather: {

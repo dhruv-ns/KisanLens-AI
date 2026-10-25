@@ -172,4 +172,60 @@ export const yieldApi = {
   },
 };
 
+// ====== VOICE API (Gnani AI Integration) ======
+export const voiceApi = {
+  /** Get voice service status and capabilities */
+  getStatus: async () => {
+    const res = await api.get('/voice/status');
+    return res.data;
+  },
+
+  /** Transcribe audio file to text (STT) */
+  transcribe: async (audioBlob: Blob, language = 'hi-IN') => {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.webm');
+    formData.append('language', language);
+    const res = await api.post('/voice/transcribe', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000,
+    });
+    return res.data;
+  },
+
+  /** Synthesize text to audio (TTS) */
+  synthesize: async (text: string, language = 'hi-IN') => {
+    const res = await api.post('/voice/synthesize',
+      { text, language },
+      { responseType: 'blob', timeout: 30000 }
+    );
+    return res.data as Blob;
+  },
+
+  /** Full voice chat pipeline: audio/text → AI response + audio */
+  chat: async (params: {
+    audioBlob?: Blob;
+    message?: string;
+    sessionId?: string;
+    language?: string;
+    context?: any;
+    wantAudio?: boolean;
+  }) => {
+    const formData = new FormData();
+    if (params.audioBlob) {
+      formData.append('audio', params.audioBlob, 'recording.webm');
+    }
+    if (params.message) formData.append('message', params.message);
+    if (params.sessionId) formData.append('sessionId', params.sessionId);
+    formData.append('language', params.language || 'hi-IN');
+    if (params.context) formData.append('context', JSON.stringify(params.context));
+    formData.append('wantAudio', params.wantAudio !== false ? 'true' : 'false');
+
+    const res = await api.post('/voice/chat', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000,
+    });
+    return res.data;
+  },
+};
+
 export default api;

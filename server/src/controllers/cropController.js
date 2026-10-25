@@ -1,4 +1,4 @@
-const { analyzeCropImage } = require('../services/geminiService');
+const { analyzeCrop: gnaniAnalyzeCrop } = require('../services/gnaniService');
 const CropAnalysis = require('../models/CropAnalysis');
 const { isDBConnected } = require('../config/database');
 const { uploadToImageKit } = require('../utils/imagekit');
@@ -7,6 +7,7 @@ const fs = require('fs');
 
 /**
  * POST /api/crops/analyze
+ * Diagnoses crop health using Gnani AI (Evon v3.3)
  */
 async function analyzeCrop(req, res, next) {
   try {
@@ -15,12 +16,17 @@ async function analyzeCrop(req, res, next) {
     }
 
     const crop = req.body.crop || 'Unknown';
+    const symptoms = req.body.symptoms || req.body.notes || '';
+    const language = req.body.language || 'hi';
     const imagePath = req.file.path;
 
-    logger.info(`Analyzing crop image: ${crop}, file: ${req.file.filename}`);
+    logger.info(`Analyzing crop image via Gnani AI: ${crop}, lang: ${language}, file: ${req.file.filename}`);
 
-    // Call Gemini AI
-    const analysis = await analyzeCropImage(imagePath, crop);
+    // Call Gnani AI Crop Diagnostic Engine with regional language
+    const analysis = await gnaniAnalyzeCrop(imagePath, crop, symptoms, {
+      location: req.body.location,
+      language,
+    });
 
     // Upload image to ImageKit
     let imageUrl = `/uploads/${req.file.filename}`; // fallback
@@ -59,7 +65,10 @@ async function analyzeCrop(req, res, next) {
       }
     }
 
-    const disclaimer = 'AI-assisted preliminary assessment. For serious crop damage or uncertain cases, consult a qualified agricultural expert.';
+    const isEn = language === 'en' || language === 'en-in' || language === 'en-IN';
+    const disclaimer = isEn
+      ? 'AI-assisted preliminary assessment powered by Gnani AI. For serious crop damage or uncertain cases, consult a qualified agricultural expert or your local Krishi Vigyan Kendra (KVK).'
+      : 'Gnani AI द्वारा संचालित प्रारंभिक कृषि स्वास्थ्य मूल्यांकन। गंभीर फसल क्षति या अनिश्चित मामलों में अपने नजदीकी कृषि विज्ञान केंद्र (KVK) या कृषि विशेषज्ञ से सलाह लें।';
 
     res.status(200).json({
       success: true,
@@ -67,7 +76,9 @@ async function analyzeCrop(req, res, next) {
         id: recordId,
         ...analysis,
         imageUrl,
+        language,
         disclaimer,
+        provider: 'Gnani AI (Evon v3.3)',
         analyzedAt: new Date().toISOString(),
       },
     });

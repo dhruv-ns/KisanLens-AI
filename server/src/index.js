@@ -19,6 +19,7 @@ const farmRoutes = require('./routes/farmRoutes');
 const assistantRoutes = require('./routes/assistantRoutes');
 const authRoutes = require('./routes/authRoutes');
 const yieldRoutes = require('./routes/yieldRoutes');
+const voiceRoutes = require('./routes/voiceRoutes');
 
 const app = express();
 
@@ -64,9 +65,10 @@ const aiLimiter = rateLimit({
 });
 app.use('/api/crops/analyze', aiLimiter);
 app.use('/api/assistant/message', aiLimiter);
+app.use('/api/voice', aiLimiter);
 
 // Body parsing
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
 app.use(compression());
@@ -100,6 +102,7 @@ app.get('/', (req, res) => {
       weather: '/api/weather',
       market: '/api/market',
       assistant: '/api/assistant',
+      voice: '/api/voice',
     },
   });
 });
@@ -124,6 +127,7 @@ app.use('/api/assistant', assistantRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', authRoutes);
 app.use('/api/yield', yieldRoutes);
+app.use('/api/voice', voiceRoutes);
 
 // 404 handler
 app.use('/api/*path', (req, res) => {

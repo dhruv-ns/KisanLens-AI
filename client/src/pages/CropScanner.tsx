@@ -1,13 +1,25 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Upload, X, Loader2, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Camera, Upload, X, Loader2, AlertCircle, Image as ImageIcon, Languages } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cropApi } from '../services/api';
 import toast from 'react-hot-toast';
 
-const CROPS = ['Tomato', 'Potato', 'Rice', 'Wheat', 'Onion', 'Cotton', 'Maize', 'Sugarcane', 'Soybean', 'Other'];
+const CROPS = ['Tomato', 'Potato/आलू', 'Rice/चावल', 'Wheat/गेहूं', 'Onion/प्याज', 'Cotton/कपास', 'Maize/मक्का', 'Sugarcane/गन्ना', 'Soybean/सोयाबीन', 'Other/अन्य'];
 const MAX_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+const REGIONAL_LANGUAGES = [
+  { code: 'hi', name: 'हिन्दी', label: 'Hindi' },
+  { code: 'pa', name: 'ਪੰਜਾਬੀ', label: 'Punjabi' },
+  { code: 'mr', name: 'मराठी', label: 'Marathi' },
+  { code: 'gu', name: 'ગુજરાતી', label: 'Gujarati' },
+  { code: 'ta', name: 'தமிழ்', label: 'Tamil' },
+  { code: 'te', name: 'తెలుగు', label: 'Telugu' },
+  { code: 'kn', name: 'ಕನ್ನಡ', label: 'Kannada' },
+  { code: 'bn', name: 'বাংলা', label: 'Bengali' },
+  { code: 'en', name: 'English', label: 'English' },
+];
 
 export default function CropScanner() {
   const { t, language } = useLanguage();
@@ -16,6 +28,7 @@ export default function CropScanner() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedCrop, setSelectedCrop] = useState('');
+  const [reportLanguage, setReportLanguage] = useState<string>(language === 'en' ? 'en' : 'hi');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -24,9 +37,14 @@ export default function CropScanner() {
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
 
-  const progressMessages = language === 'en'
-    ? ['Uploading image...', 'Examining visible symptoms...', 'Analyzing crop health...', 'Preparing recommendations...']
-    : ['तस्वीर अपलोड हो रही है...', 'दृश्य लक्षणों की जांच...', 'फसल स्वास्थ्य का विश्लेषण...', 'सिफारिशें तैयार हो रही हैं...'];
+  // Sync default report language if app language changes
+  useEffect(() => {
+    setReportLanguage(language === 'en' ? 'en' : 'hi');
+  }, [language]);
+
+  const progressMessages = reportLanguage === 'en'
+    ? ['Uploading image...', 'Examining visible symptoms...', 'Analyzing crop health...', 'Preparing regional recommendations...']
+    : ['तस्वीर अपलोड हो रही है...', 'रोग व कीट लक्षणों की जांच...', 'फसल स्वास्थ्य का विश्लेषण...', 'क्षेत्रीय भाषा में सिफारिशें तैयार हो रही हैं...'];
 
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) return language === 'en' ? 'Invalid file type. Please use JPG, PNG, or WEBP.' : 'अमान्य फ़ाइल प्रकार। कृपया JPG, PNG, या WEBP का उपयोग करें।';
@@ -73,11 +91,12 @@ export default function CropScanner() {
       const formData = new FormData();
       formData.append('image', imageFile);
       formData.append('crop', selectedCrop);
+      formData.append('language', reportLanguage);
 
       const result = await cropApi.analyze(formData);
       clearInterval(interval);
       setProgress(100);
-      setProgressText(language === 'en' ? 'Analysis complete!' : 'विश्लेषण पूर्ण!');
+      setProgressText(reportLanguage === 'en' ? 'Analysis complete!' : 'विश्लेषण पूर्ण!');
 
       setTimeout(() => {
         navigate(`/crop-analysis/${result.data.id}`, { state: { analysis: result.data } });
@@ -119,14 +138,47 @@ export default function CropScanner() {
           {CROPS.map((crop) => (
             <button
               key={crop}
+              type="button"
               onClick={() => setSelectedCrop(crop)}
               className={`px-2 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer border ${
                 selectedCrop === crop
-                  ? 'bg-primary-600 text-white border-primary-600 shadow-md'
+                  ? 'bg-primary-600 text-white border-primary-600 shadow-md ring-2 ring-primary-200'
                   : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-primary-300'
               }`}
             >
               {getCropLabel(crop)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Regional Language Selection */}
+      <div className="bg-white rounded-2xl p-4 border border-[var(--color-border)] shadow-sm">
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-1.5">
+            <Languages className="w-4 h-4 text-primary-600" />
+            <span>{t('scanner.reportLanguage')}</span>
+          </label>
+          <span className="text-xs bg-primary-50 text-primary-700 font-semibold px-2.5 py-0.5 rounded-full border border-primary-200">
+            {REGIONAL_LANGUAGES.find(l => l.code === reportLanguage)?.name || 'हिन्दी'}
+          </span>
+        </div>
+        <p className="text-xs text-[var(--color-text-muted)] mb-3">
+          {t('scanner.reportLanguageDesc')}
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {REGIONAL_LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => setReportLanguage(lang.code)}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                reportLanguage === lang.code
+                  ? 'bg-primary-600 text-white border-primary-600 shadow-sm font-semibold'
+                  : 'bg-gray-50 text-[var(--color-text-secondary)] border-gray-200 hover:bg-gray-100 hover:border-gray-300'
+              }`}
+            >
+              {lang.name} <span className="text-[10px] opacity-75 font-normal">({lang.label})</span>
             </button>
           ))}
         </div>
@@ -147,6 +199,7 @@ export default function CropScanner() {
 
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
             <button
+              type="button"
               onClick={() => cameraInputRef.current?.click()}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors cursor-pointer text-sm"
             >
@@ -154,6 +207,7 @@ export default function CropScanner() {
               {t('scanner.takePhoto')}
             </button>
             <button
+              type="button"
               onClick={() => fileInputRef.current?.click()}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-[var(--color-text-primary)] rounded-xl font-medium border border-[var(--color-border)] hover:bg-gray-50 transition-colors cursor-pointer text-sm"
             >
@@ -171,6 +225,7 @@ export default function CropScanner() {
         <div className="relative bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
           <img src={imagePreview} alt="Crop preview" className="w-full max-h-80 object-contain bg-gray-50" />
           <button
+            type="button"
             onClick={clearImage}
             className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 cursor-pointer"
             aria-label="Remove image"
@@ -178,7 +233,7 @@ export default function CropScanner() {
             <X className="w-4 h-4" />
           </button>
           <div className="p-3 text-center">
-            <button onClick={() => fileInputRef.current?.click()} className="text-sm text-primary-600 font-medium hover:underline cursor-pointer bg-transparent border-none">
+            <button type="button" onClick={() => fileInputRef.current?.click()} className="text-sm text-primary-600 font-medium hover:underline cursor-pointer bg-transparent border-none">
               {t('scanner.changeImage')}
             </button>
             <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} />
@@ -208,6 +263,7 @@ export default function CropScanner() {
         </div>
       ) : (
         <button
+          type="button"
           onClick={handleAnalyze}
           disabled={!imageFile || !selectedCrop}
           className={`w-full py-3.5 rounded-xl font-semibold text-lg transition-all cursor-pointer border-none ${

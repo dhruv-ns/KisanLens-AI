@@ -100,3 +100,174 @@ body {
 
 /* Bottom nav safe area */
 .pb-safe { padding-bottom: max(env(safe-area-inset-bottom, 0px), 80px); }
+
+/* ═══════════════════════════════════════════
+   Voice-First UI Styles
+   ═══════════════════════════════════════════ */
+
+/* Fade + slide-in animation for messages */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeSlideIn {
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+/* ── Voice Hero Orb (empty state) ── */
+.voice-hero-orb {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.voice-orb-inner {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.15);
+}
+.voice-orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(22, 163, 74, 0.15);
+  animation: orbPulse 2.5s ease-in-out infinite;
+}
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0; }
+}
+
+/* ── Transcription Preview Banner ── */
+.voice-transcript-banner {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.25);
+}
+
+/* ── Recording Indicator Bar ── */
+.voice-recording-bar {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border: 1px solid #fecaca;
+  animation: recordBarPulse 1.5s ease-in-out infinite;
+}
+@keyframes recordBarPulse {
+  0%, 100% { border-color: #fecaca; }
+  50% { border-color: #f87171; }
+}
+
+/* ── Recording Pulse Dot ── */
+.voice-recording-pulse {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: micPulse 1s ease-in-out infinite;
+}
+.voice-recording-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  animation: micRingPulse 1s ease-in-out infinite;
+}
+@keyframes micPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes micRingPulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 0; }
+}
+
+/* ── Mic Button Hover Effect ── */
+.voice-mic-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.voice-mic-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* ── Thinking Dots Animation ── */
+.voice-thinking-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.voice-thinking-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a8a29e;
+  animation: thinkingBounce 1.4s ease-in-out infinite;
+}
+.voice-thinking-dots span:nth-child(2) { animation-delay: 0.16s; }
+.voice-thinking-dots span:nth-child(3) { animation-delay: 0.32s; }
+@keyframes thinkingBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Mini Audio Bars (playing indicator) ── */
+.voice-bars-mini {
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 12px;
+}
+.voice-bars-mini span {
+  width: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  animation: miniBar 0.8s ease-in-out infinite;
+}
+.voice-bars-mini span:nth-child(1) { height: 4px; animation-delay: 0s; }
+.voice-bars-mini span:nth-child(2) { height: 8px; animation-delay: 0.15s; }
+.voice-bars-mini span:nth-child(3) { height: 6px; animation-delay: 0.3s; }
+@keyframes miniBar {
+  0%, 100% { height: 4px; }
+  50% { height: 12px; }
+}
+
+/* ── Voice Waves (recording mic icon) ── */
+.voice-waves-container {
+  position: relative;
+}
+.voice-waves-container::before,
+.voice-waves-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  animation: waveExpand 1.5s ease-out infinite;
+}
+.voice-waves-container::before {
+  inset: -6px;
+}
+.voice-waves-container::after {
+  inset: -12px;
+  animation-delay: 0.5s;
+}
+@keyframes waveExpand {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}

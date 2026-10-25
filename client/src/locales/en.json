@@ -47,6 +47,8 @@
     "supportedFormats": "Supported: JPG, PNG, WEBP",
     "preview": "Image Preview",
     "changeImage": "Change Image",
+    "reportLanguage": "Report Language",
+    "reportLanguageDesc": "Select regional language for diagnosis & recommendations",
     "crops": {
       "tomato": "Tomato",
       "potato": "Potato",
@@ -72,6 +74,9 @@
     "disclaimer": "AI-assisted preliminary assessment. For serious crop damage or uncertain cases, consult a qualified agricultural expert.",
     "newScan": "New Scan",
     "viewHistory": "View History",
+    "listenReport": "Listen to Report",
+    "stopAudio": "Stop Audio",
+    "playingAudio": "Speaking Report...",
     "severityLevels": {
       "healthy": "Healthy",
       "low": "Low Risk",
@@ -127,7 +132,20 @@
     ],
     "voiceButton": "Voice Input",
     "listening": "Listening...",
-    "voiceNotSupported": "Voice input is not supported in this browser."
+    "voiceNotSupported": "Voice input is not supported in this browser.",
+    "voiceTitle": "AI Farm Assistant",
+    "voiceSubtitle": "Speak or type in Hindi or English",
+    "youSaid": "You said",
+    "speakOrType": "Press the mic button to speak in Hindi or type below",
+    "namaste": "Namaste! I'm your farm assistant",
+    "voiceLabel": "Voice",
+    "listenButton": "Listen",
+    "stopButton": "Stop",
+    "cancelRecording": "Cancel",
+    "autoPlayOn": "Auto-play ON",
+    "autoPlayOff": "Auto-play OFF",
+    "voiceProcessingFailed": "Voice processing failed. Please try again.",
+    "typeHere": "Type in Hindi or English..."
   },
   "farm": {
     "title": "Farm Profile",

@@ -1,10 +1,11 @@
-const { chatWithAssistant } = require('../services/geminiService');
+const { agriculturalChat } = require('../services/gnaniService');
 const AssistantConversation = require('../models/AssistantConversation');
 const { isDBConnected } = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 
 /**
  * POST /api/assistant/message
+ * Handles agricultural chat messages using Gnani AI (Evon v3.3)
  */
 async function sendMessage(req, res, next) {
   try {
@@ -25,11 +26,8 @@ async function sendMessage(req, res, next) {
       } catch { /* ignore */ }
     }
 
-    // Get AI response
-    const response = await chatWithAssistant(message.trim(), {
-      ...(context || {}),
-      history,
-    });
+    // Get AI response via Gnani AI (Evon v3.3)
+    const response = await agriculturalChat(message.trim(), context || {}, history);
 
     // Save conversation if DB is available
     if (isDBConnected()) {
@@ -58,6 +56,7 @@ async function sendMessage(req, res, next) {
       data: {
         sessionId: sid,
         response,
+        provider: 'Gnani AI (Evon v3.3)',
         timestamp: new Date().toISOString(),
       },
     });
