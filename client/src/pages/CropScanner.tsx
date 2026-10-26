@@ -5,7 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { cropApi } from '../services/api';
 import toast from 'react-hot-toast';
 
-const CROPS = ['Tomato', 'Potato/आलू', 'Rice/चावल', 'Wheat/गेहूं', 'Onion/प्याज', 'Cotton/कपास', 'Maize/मक्का', 'Sugarcane/गन्ना', 'Soybean/सोयाबीन', 'Other/अन्य'];
+const CROPS = ['Tomato/टमाटर', 'Potato/आलू', 'Rice/चावल', 'Wheat/गेहूं', 'Onion/प्याज', 'Cotton/कपास', 'Maize/मक्का', 'Sugarcane/गन्ना', 'Soybean/सोयाबीन', 'Other/अन्य'];
 const MAX_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
