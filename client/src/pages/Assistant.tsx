@@ -74,6 +74,12 @@ export default function Assistant() {
   // ── Voice Submit (Full Pipeline) ──
   const handleVoiceSubmit = async (audioBlob: Blob) => {
     if (loading) return;
+    if (!audioBlob || audioBlob.size < 500) {
+      toast.error(language === 'hi'
+        ? 'आवाज़ बहुत छोटी थी। कृपया माइक दबाकर बोलें।'
+        : 'Recording was too short. Please press the mic and speak.');
+      return;
+    }
     setLoading(true);
 
     try {
@@ -96,38 +102,38 @@ export default function Assistant() {
         const data = res.data;
 
         // Show transcript preview
+        const userText = data.userTranscript || (language === 'hi' ? '🎤 आवाज़ इनपुट' : '🎤 Voice input');
         if (data.userTranscript) {
           setPendingTranscript(data.userTranscript);
           setShowTranscript(true);
-
-          // Add user message
-          const userMsg: Message = {
-            id: `user_${Date.now()}`,
-            role: 'user',
-            content: data.userTranscript,
-            timestamp: new Date().toISOString(),
-            isVoice: true,
-          };
-
-          const aiMsg: Message = {
-            id: `ai_${Date.now()}`,
-            role: 'assistant',
-            content: data.response,
-            timestamp: data.timestamp,
-            audioBase64: data.audioBase64,
-            audioContentType: data.audioContentType,
-          };
-
-          setMessages(prev => [...prev, userMsg, aiMsg]);
-
-          // Auto-play audio response
-          if (autoPlayAudio && data.hasAudio && data.audioBase64) {
-            playAudioFromBase64(data.audioBase64, data.audioContentType, aiMsg.id, data.response);
-          } else if (autoPlayAudio) {
-            audioPlayer.speakBrowser(data.response, getLanguageCode());
-          }
-
           setTimeout(() => setShowTranscript(false), 3000);
+        }
+
+        // Add user and assistant message
+        const userMsg: Message = {
+          id: `user_${Date.now()}`,
+          role: 'user',
+          content: userText,
+          timestamp: new Date().toISOString(),
+          isVoice: true,
+        };
+
+        const aiMsg: Message = {
+          id: `ai_${Date.now()}`,
+          role: 'assistant',
+          content: data.response,
+          timestamp: data.timestamp || new Date().toISOString(),
+          audioBase64: data.audioBase64,
+          audioContentType: data.audioContentType,
+        };
+
+        setMessages(prev => [...prev, userMsg, aiMsg]);
+
+        // Auto-play audio response
+        if (autoPlayAudio && data.hasAudio && data.audioBase64) {
+          playAudioFromBase64(data.audioBase64, data.audioContentType, aiMsg.id, data.response);
+        } else if (autoPlayAudio && data.response) {
+          audioPlayer.speakBrowser(data.response, getLanguageCode());
         }
       } else {
         // Fallback: use browser SpeechRecognition for STT, then text API
@@ -135,9 +141,11 @@ export default function Assistant() {
         await handleBrowserSTTFallback(audioBlob);
       }
     } catch (err: any) {
-      const errorMsg = language === 'hi'
-        ? 'आवाज़ प्रक्रिया में समस्या। कृपया फिर से बोलें।'
-        : 'Voice processing failed. Please try again.';
+      console.error('Voice submission error:', err);
+      const serverErrMsg = err?.response?.data?.error;
+      const errorMsg = serverErrMsg || (language === 'hi'
+        ? 'आवाज़ समझने में समस्या। कृपया माइक पास लाकर स्पष्ट बोलें या नीचे टाइप करें।'
+        : 'Could not understand audio. Please speak clearly into your mic or type below.');
       toast.error(errorMsg);
     } finally {
       setLoading(false);

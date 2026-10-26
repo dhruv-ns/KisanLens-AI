@@ -128,16 +128,55 @@ async function voiceChat(req, res, next) {
       }
 
       logger.info(`Transcribing voice input: ${req.file.size} bytes, lang=${languageCode}`);
-      const sttResult = await transcribeAudio(
-        req.file.buffer,
-        req.file.originalname || 'audio.webm',
-        languageCode
-      );
-      userMessage = sttResult.transcript;
-      userTranscript = sttResult.transcript;
+      try {
+        const sttResult = await transcribeAudio(
+          req.file.buffer,
+          req.file.originalname || 'audio.wav',
+          languageCode
+        );
+        userMessage = sttResult.transcript || '';
+        userTranscript = sttResult.transcript || '';
+      } catch (sttErr) {
+        logger.warn('Gnani STT transcription warning:', sttErr.message);
+        userMessage = '';
+        userTranscript = '';
+      }
     }
 
     if (!userMessage || !userMessage.trim()) {
+      // If voice audio was sent but nothing was transcribed (silence/soft speech)
+      if (req.file) {
+        const promptText = languageCode.startsWith('hi')
+          ? 'नमस्ते! मुझे आपकी आवाज़ स्पष्ट सुनाई नहीं दी। कृपया माइक बटन दबाकर दोबारा बोलें।'
+          : 'Hello! I could not hear you clearly. Please press the mic button and speak again.';
+
+        let audioBase64 = null;
+        let audioContentType = 'audio/wav';
+        if (isGnaniConfigured() && req.body.wantAudio !== 'false') {
+          try {
+            const ttsResult = await synthesizeSpeech(promptText, languageCode);
+            audioBase64 = ttsResult.audioBuffer.toString('base64');
+            audioContentType = ttsResult.contentType;
+          } catch (e) {
+            logger.warn('Prompt TTS synthesis failed:', e.message);
+          }
+        }
+
+        return res.json({
+          success: true,
+          data: {
+            sessionId,
+            userTranscript: languageCode.startsWith('hi') ? '(आवाज़ स्पष्ट नहीं थी)' : '(Unclear audio)',
+            response: promptText,
+            provider: 'Gnani AI',
+            timestamp: new Date().toISOString(),
+            hasAudio: !!audioBase64,
+            audioBase64,
+            audioContentType,
+          },
+        });
+      }
+
       return res.status(400).json({
         success: false,
         error: 'No message provided. Send audio or text.',

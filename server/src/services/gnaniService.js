@@ -50,18 +50,51 @@ const LANGUAGE_META = {
 /**
  * Transcribe audio buffer using Gnani Prisma v2.5 STT
  */
-async function transcribeAudio(audioBuffer, filename = 'audio.webm', languageCode = 'hi-IN') {
+async function transcribeAudio(audioBuffer, filename = 'audio.wav', languageCode = 'hi-IN') {
   if (!isGnaniConfigured()) {
     throw new Error('Gnani AI API key is not configured. Set GNANI_API_KEY in your .env file.');
   }
 
+  // Normalize language code to Gnani Prisma's required formats
+  const gnaniLangMap = {
+    'hi': 'hi-IN',
+    'hi-in': 'hi-IN',
+    'en': 'en-IN',
+    'en-in': 'en-IN',
+    'pa': 'pa-IN',
+    'pa-in': 'pa-IN',
+    'mr': 'mr-IN',
+    'mr-in': 'mr-IN',
+    'gu': 'gu-IN',
+    'gu-in': 'gu-IN',
+    'ta': 'ta-IN',
+    'ta-in': 'ta-IN',
+    'te': 'te-IN',
+    'te-in': 'te-IN',
+    'kn': 'kn-IN',
+    'kn-in': 'kn-IN',
+    'bn': 'bn-IN',
+    'bn-in': 'bn-IN',
+    'ml': 'ml-IN',
+    'ml-in': 'ml-IN',
+    'as': 'as-IN',
+    'as-in': 'as-IN',
+  };
+  const normalizedLang = gnaniLangMap[String(languageCode).toLowerCase()] || 'hi-IN';
+
+  // Ensure audio has a valid RIFF/WAV container
+  let cleanBuffer = audioBuffer;
+  if (audioBuffer.slice(0, 4).toString() !== 'RIFF') {
+    cleanBuffer = pcmToWav(audioBuffer, 16000, 1, 16);
+  }
+
   const form = new FormData();
-  form.append('audio_file', audioBuffer, {
-    filename,
-    contentType: getMimeType(filename),
+  form.append('audio_file', cleanBuffer, {
+    filename: filename.endsWith('.wav') ? filename : 'audio.wav',
+    contentType: 'audio/wav',
   });
-  form.append('language_code', languageCode);
-  form.append('preferred_language', languageCode);
+  form.append('language_code', normalizedLang);
+  form.append('preferred_language', normalizedLang);
   form.append('format', 'transcribe');
   form.append('itn_native_numerals', 'true');
 
@@ -76,22 +109,13 @@ async function transcribeAudio(audioBuffer, filename = 'audio.webm', languageCod
     });
 
     const data = response.data;
+    const transcriptText = data.transcript || data.output?.literal || data.text || '';
 
-    if (data.transcript || data.text) {
-      return {
-        success: true,
-        transcript: data.transcript || data.text,
-        requestId: data.request_id || null,
-        language: languageCode,
-      };
-    }
-
-    logger.warn('Gnani STT: unexpected response structure:', JSON.stringify(data).slice(0, 500));
     return {
       success: true,
-      transcript: typeof data === 'string' ? data : JSON.stringify(data),
-      requestId: null,
-      language: languageCode,
+      transcript: typeof transcriptText === 'string' ? transcriptText.trim() : JSON.stringify(transcriptText),
+      requestId: data.request_id || null,
+      language: normalizedLang,
     };
   } catch (error) {
     const status = error.response?.status;

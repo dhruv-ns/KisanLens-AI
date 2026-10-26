@@ -183,7 +183,7 @@ export const voiceApi = {
   /** Transcribe audio file to text (STT) */
   transcribe: async (audioBlob: Blob, language = 'hi-IN') => {
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'recording.webm');
+    formData.append('audio', audioBlob, 'recording.wav');
     formData.append('language', language);
     const res = await api.post('/voice/transcribe', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -212,7 +212,7 @@ export const voiceApi = {
   }) => {
     const formData = new FormData();
     if (params.audioBlob) {
-      formData.append('audio', params.audioBlob, 'recording.webm');
+      formData.append('audio', params.audioBlob, 'recording.wav');
     }
     if (params.message) formData.append('message', params.message);
     if (params.sessionId) formData.append('sessionId', params.sessionId);
