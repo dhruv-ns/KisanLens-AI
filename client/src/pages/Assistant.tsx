@@ -243,21 +243,18 @@ export default function Assistant() {
   const playAudioFromBase64 = (base64: string, contentType: string, messageId: string, fallbackText?: string) => {
     try {
       const byteCharacters = atob(base64);
-      const byteNumbers = new Array(byteCharacters.length);
+      const byteArray = new Uint8Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+        byteArray[i] = byteCharacters.charCodeAt(i);
       }
-      const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: contentType || 'audio/wav' });
       setPlayingMessageId(messageId);
       audioPlayer.play(blob, fallbackText, getLanguageCode());
-    } catch {
+    } catch (err) {
+      console.error('Audio decode error:', err);
       setPlayingMessageId(messageId);
       if (fallbackText) {
         audioPlayer.speakBrowser(fallbackText, getLanguageCode());
-      } else {
-        const msg = messages.find(m => m.id === messageId);
-        if (msg) audioPlayer.speakBrowser(msg.content, getLanguageCode());
       }
     }
   };

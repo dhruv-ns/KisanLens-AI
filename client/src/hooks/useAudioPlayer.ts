@@ -142,9 +142,17 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     utterance.pitch = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const matchingVoice = voices.find(v => v.lang === lang) ||
-      voices.find(v => v.lang.startsWith(lang.split('-')[0])) ||
-      voices.find(v => v.lang.includes('IN') || v.lang.includes('hi'));
+    const isHindi = lang.startsWith('hi');
+    const matchingVoice = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi_IN' || v.lang.startsWith('hi')) ||
+      voices.find(v => v.name.toLowerCase().includes('hindi') || v.name.includes('हिन्दी'));
+
+    // Critical: Never let an English voice read Hindi text, as it skips Devanagari and only reads Latin words
+    if (isHindi && !matchingVoice) {
+      console.warn('No native Hindi voice available in browser speech synthesis.');
+      setState(prev => ({ ...prev, isPlaying: false, error: null }));
+      return;
+    }
+
     if (matchingVoice) utterance.voice = matchingVoice;
 
     utterance.onstart = () => {
@@ -192,6 +200,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       const audio = new Audio();
       audioRef.current = audio;
       audio.preload = 'auto';
+      audio.src = finalSrc;
 
       audio.onloadedmetadata = () => {
         setState(prev => ({
@@ -215,7 +224,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       };
 
       audio.onerror = (e) => {
-        console.warn('Audio element error, falling back to browser speech:', e);
+        console.warn('Audio element error, falling back:', e);
         cleanupAudio();
         if (fallbackText) {
           speakBrowser(fallbackText, lang);
@@ -228,8 +237,14 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       setState(prev => ({ ...prev, isPlaying: true, isPaused: false, error: null }));
       animFrameRef.current = requestAnimationFrame(updateProgress);
     } catch (err: any) {
-      console.warn('Audio play() failed, falling back to browser speech:', err.message);
       cleanupAudio();
+      if (err.name === 'NotAllowedError') {
+        // Autoplay blocked by browser policy without recent user click
+        console.warn('Browser blocked autoplay. User can click Listen to play.');
+        setState(prev => ({ ...prev, isPlaying: false, error: null }));
+        return;
+      }
+      console.warn('Audio play() failed, trying speech fallback:', err.message);
       if (fallbackText) {
         speakBrowser(fallbackText, lang);
       } else {
