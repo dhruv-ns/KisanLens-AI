@@ -138,7 +138,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = lang;
-    utterance.rate = 0.95;
+    utterance.rate = 1.05;
     utterance.pitch = 1.0;
 
     const voices = window.speechSynthesis.getVoices();

@@ -58,7 +58,7 @@ async function transcribe(req, res, next) {
  */
 async function synthesize(req, res, next) {
   try {
-    const { text, language = 'hi-IN', voice = null, speed = 1.0 } = req.body;
+    const { text, language = 'hi-IN', voice = null, speed } = req.body;
 
     if (!text || !text.trim()) {
       return res.status(400).json({
@@ -75,7 +75,8 @@ async function synthesize(req, res, next) {
       });
     }
 
-    const result = await synthesizeSpeech(text.trim(), language, voice, parseFloat(speed) || 1.0);
+    const parsedSpeed = speed ? parseFloat(speed) : undefined;
+    const result = await synthesizeSpeech(text.trim(), language, voice, parsedSpeed);
 
     // Return as binary audio stream
     res.setHeader('Content-Type', result.contentType || 'audio/wav');

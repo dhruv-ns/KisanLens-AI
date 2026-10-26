@@ -192,7 +192,7 @@ function pcmToWav(pcmBuffer, sampleRate = 24000, numChannels = 1, bitDepth = 16)
 /**
  * Synthesize text to speech using Gnani Timbre v2.5
  */
-async function synthesizeSpeech(text, languageCode = 'hi-IN', voice = null, speed = 1.0) {
+async function synthesizeSpeech(text, languageCode = 'hi-IN', voice = null, speed = 1.15) {
   if (!isGnaniConfigured()) {
     throw new Error('Gnani AI API key is not configured. Set GNANI_API_KEY in your .env file.');
   }
