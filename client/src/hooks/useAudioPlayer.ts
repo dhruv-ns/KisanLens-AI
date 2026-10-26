@@ -142,13 +142,28 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     utterance.pitch = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const isHindi = lang.startsWith('hi');
-    const matchingVoice = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi_IN' || v.lang.startsWith('hi')) ||
-      voices.find(v => v.name.toLowerCase().includes('hindi') || v.name.includes('हिन्दी'));
+    const langKey = lang.toLowerCase().split('-')[0].split('_')[0];
+    const isIndic = ['hi', 'pa', 'mr', 'gu', 'ta', 'te', 'kn', 'bn'].includes(langKey);
 
-    // Critical: Never let an English voice read Hindi text, as it skips Devanagari and only reads Latin words
-    if (isHindi && !matchingVoice) {
-      console.warn('No native Hindi voice available in browser speech synthesis.');
+    const matchingVoice = voices.find(v => {
+      const vLang = v.lang.toLowerCase().replace('_', '-');
+      return vLang === lang.toLowerCase().replace('_', '-') || vLang.startsWith(langKey);
+    }) || voices.find(v => {
+      const name = v.name.toLowerCase();
+      if (langKey === 'hi') return name.includes('hindi') || name.includes('हिन्दी');
+      if (langKey === 'pa') return name.includes('punjabi') || name.includes('ਪੰਜਾਬੀ');
+      if (langKey === 'mr') return name.includes('marathi') || name.includes('मराठी');
+      if (langKey === 'gu') return name.includes('gujarati') || name.includes('ગુજરાતી');
+      if (langKey === 'ta') return name.includes('tamil') || name.includes('தமிழ்');
+      if (langKey === 'te') return name.includes('telugu') || name.includes('తెలుగు');
+      if (langKey === 'kn') return name.includes('kannada') || name.includes('ಕನ್ನಡ');
+      if (langKey === 'bn') return name.includes('bengali') || name.includes('বাংলা');
+      return false;
+    });
+
+    // Critical: Never let an English voice read Indic text, as it skips or garbles regional characters
+    if (isIndic && !matchingVoice) {
+      console.warn(`No native ${lang} voice available in browser speech synthesis.`);
       setState(prev => ({ ...prev, isPlaying: false, error: null }));
       return;
     }

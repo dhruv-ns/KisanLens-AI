@@ -57,19 +57,36 @@ export default function CropAnalysisResult() {
 
     const obsText = Array.isArray(analysis.observations) ? analysis.observations.slice(0, 3).join('. ') : '';
     const actText = Array.isArray(analysis.recommendedActions) ? analysis.recommendedActions.slice(0, 3).join('. ') : '';
-    const fullText = `${analysis.crop}। समस्या: ${analysis.possibleIssue}। मुख्य लक्षण: ${obsText}। उपचार: ${actText}। ${analysis.expertAttention || ''}`;
 
     const langCode = analysis.language || 'hi-IN';
+    const langKey = langCode.toLowerCase().split('-')[0].split('_')[0];
+
+    // Localized spoken prefixes for each supported regional language
+    const spokenPrefixes: Record<string, { issue: string; symptoms: string; treatment: string }> = {
+      hi: { issue: 'समस्या', symptoms: 'मुख्य लक्षण', treatment: 'उपचार' },
+      pa: { issue: 'ਸਮੱਸਿਆ', symptoms: 'ਮੁੱਖ ਲੱਛਣ', treatment: 'ਇਲਾਜ' },
+      mr: { issue: 'समस्या', symptoms: 'मुख्य लक्षणे', treatment: 'उपाय' },
+      gu: { issue: 'સમસ્યા', symptoms: 'મુખ્ય લક્ષણો', treatment: 'ઉપાય' },
+      ta: { issue: 'பிரச்சனை', symptoms: 'முக்கிய அறிகுறிகள்', treatment: 'சிகிச்சை' },
+      te: { issue: 'సమస్య', symptoms: 'ప్రధాన లక్షణాలు', treatment: 'చికిత్స' },
+      kn: { issue: 'ಸಮಸ್ಯೆ', symptoms: 'ಮುಖ್ಯ ಲಕ್ಷಣಗಳು', treatment: 'ಚಿಕಿತ್ಸೆ' },
+      bn: { issue: 'সমস্যা', symptoms: 'প্রধান লক্ষণ', treatment: 'প্রতিকার' },
+      en: { issue: 'Issue', symptoms: 'Key observations', treatment: 'Recommended actions' },
+    };
+    const pfx = spokenPrefixes[langKey] || spokenPrefixes.hi;
+    const punct = ['en', 'ta', 'te', 'kn', 'mr'].includes(langKey) ? '.' : '।';
+
+    const fullText = `${analysis.crop}${punct} ${pfx.issue}: ${analysis.possibleIssue}${punct} ${pfx.symptoms}: ${obsText}${punct} ${pfx.treatment}: ${actText}${punct} ${analysis.expertAttention || ''}`;
 
     // Try Gnani Timbre TTS first with browser speech fallback
     try {
       setAudioLoading(true);
       const audioBlob = await voiceApi.synthesize(fullText.slice(0, 1000), langCode);
       setAudioLoading(false);
-      play(audioBlob, fullText, langCode.startsWith('hi') ? 'hi-IN' : langCode);
+      play(audioBlob, fullText, langCode);
     } catch {
       setAudioLoading(false);
-      speakBrowser(fullText, langCode.startsWith('hi') ? 'hi-IN' : langCode);
+      speakBrowser(fullText, langCode);
     }
   };
 
