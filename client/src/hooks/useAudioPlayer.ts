@@ -200,9 +200,12 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       const audio = new Audio();
       audioRef.current = audio;
       audio.preload = 'auto';
+      audio.defaultPlaybackRate = 1.0;
+      audio.playbackRate = 1.0;
       audio.src = finalSrc;
 
       audio.onloadedmetadata = () => {
+        audio.playbackRate = 1.0;
         setState(prev => ({
           ...prev,
           duration: audio.duration,
