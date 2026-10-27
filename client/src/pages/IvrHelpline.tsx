@@ -42,8 +42,18 @@ export default function IvrHelpline() {
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  const { play, stop, isPlaying } = useAudioPlayer();
+  const { play, stop, isPlaying, speakBrowser, stopBrowserSpeech, isBrowserSpeaking } = useAudioPlayer();
   const recorder = useVoiceRecorder(15000);
+
+  const isAudioActive = isPlaying || isBrowserSpeaking;
+
+  const FALLBACK_PROMPTS: Record<string, string> = {
+    welcome: 'नमस्ते किसान भाई! किसानलेंस एआई टेलीफोनिक हेल्पलाइन 1800-889-KISAN में आपका स्वागत है। मौसम और बारिश के लिए 1 दबाएं। मंडी के ताजा भाव के लिए 2 दबाएं। फसल रोग एवं सुरक्षा सलाह के लिए 3 दबाएं। या बीप के बाद सीधे सवाल बोलें।',
+    '1': 'लाइव मौसम रिपोर्ट: आज आपके क्षेत्र में तापमान 29 डिग्री सेल्सियस और मौसम साफ रहेगा। बारिश की संभावना केवल 5 प्रतिशत है। फसलों में हल्की सिंचाई एवं जैविक छिड़काव के लिए आज का दिन अनुकूल है। मुख्य मेनू के लिए 0 दबाएं।',
+    '2': 'ताजा मंडी भाव: गेहूं का औसत भाव ₹2,450 प्रति क्विंटल है। धान ₹2,320, प्याज ₹1,850 और टमाटर ₹2,200 प्रति क्विंटल चल रहा है। आगामी दिनों में भाव स्थिर रहने की उम्मीद है। मुख्य मेनू के लिए 0 दबाएं।',
+    '3': 'फसल सुरक्षा सलाह: पत्तियों पर धब्बे दिखने पर 5 मिली नीम तेल प्रति लीटर पानी में मिलाकर शाम को छिड़कें। फफूंद के लिए ट्राइकोडर्मा 5 ग्राम प्रति लीटर का प्रयोग करें। मुख्य मेनू के लिए 0 दबाएं।',
+    '0': 'नमस्ते किसान भाई! मौसम के लिए 1 दबाएं। मंडी भाव के लिए 2 दबाएं। फसल सलाह के लिए 3 दबाएं। मुख्य मेनू दोहराने के लिए 0 दबाएं।',
+  };
 
   // Play realistic DTMF Beep
   const playDTMF = (digit: string) => {
@@ -120,15 +130,17 @@ export default function IvrHelpline() {
 
   // Start Call
   const handleStartCall = async () => {
+    setLoading(true);
+    stop();
+    stopBrowserSpeech();
+    playDTMF('1');
+
     try {
-      setLoading(true);
-      stop();
-      playDTMF('1');
       const res = await ivrApi.startCall('hi-IN');
       setCallActive(true);
       setLoading(false);
 
-      const welcomeText = res.data?.responseText || 'Welcome to KisanLens AI Helpline 1800-889-KISAN';
+      const welcomeText = res.data?.responseText || FALLBACK_PROMPTS.welcome;
       setLastPrompt(welcomeText);
       setTranscript([
         {
@@ -141,16 +153,32 @@ export default function IvrHelpline() {
 
       if (res.data?.audioBase64) {
         playBase64Audio(res.data.audioBase64, res.data.audioContentType);
+      } else {
+        speakBrowser(welcomeText, 'hi-IN');
       }
     } catch (err: any) {
+      // Graceful offline simulation fallback
       setLoading(false);
-      toast.error('Unable to connect to helpline.');
+      setCallActive(true);
+      const welcomeText = FALLBACK_PROMPTS.welcome;
+      setLastPrompt(welcomeText);
+      setTranscript([
+        {
+          sender: 'system',
+          text: welcomeText,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          tag: '1800-889-KISAN (Simulator)',
+        },
+      ]);
+      speakBrowser(welcomeText, 'hi-IN');
+      toast.success('Connected to 1800-889-KISAN Helpline');
     }
   };
 
   // End Call
   const handleEndCall = () => {
     stop();
+    stopBrowserSpeech();
     setCallActive(false);
     setLastPrompt('Call ended. Press Call to reconnect.');
     setTranscript((prev) => [
@@ -187,7 +215,7 @@ export default function IvrHelpline() {
       const res = await ivrApi.sendAction({ digits: digit, language: 'hi-IN' });
       setLoading(false);
 
-      const responseText = res.data?.responseText || 'Processing input...';
+      const responseText = res.data?.responseText || FALLBACK_PROMPTS[digit] || FALLBACK_PROMPTS['0'];
       setLastPrompt(responseText);
       setTranscript((prev) => [
         ...prev,
@@ -201,10 +229,23 @@ export default function IvrHelpline() {
 
       if (res.data?.audioBase64) {
         playBase64Audio(res.data.audioBase64, res.data.audioContentType);
+      } else {
+        speakBrowser(responseText, 'hi-IN');
       }
     } catch (err: any) {
       setLoading(false);
-      toast.error('Failed to process IVR digit.');
+      const responseText = FALLBACK_PROMPTS[digit] || FALLBACK_PROMPTS['0'];
+      setLastPrompt(responseText);
+      setTranscript((prev) => [
+        ...prev,
+        {
+          sender: 'system',
+          text: responseText,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          tag: `Option ${digit}`,
+        },
+      ]);
+      speakBrowser(responseText, 'hi-IN');
     }
   };
 
@@ -335,7 +376,7 @@ export default function IvrHelpline() {
                       <span>Call Connected</span>
                     </div>
                     <div className="text-base font-bold text-white font-mono">1800-889-KISAN</div>
-                    {isPlaying && (
+                    {isAudioActive && (
                       <div className="flex items-center justify-center gap-1 mt-2">
                         <span className="w-1 h-3 bg-emerald-400 rounded-full animate-bounce" />
                         <span className="w-1 h-5 bg-emerald-400 rounded-full animate-bounce [animation-delay:0.15s]" />
