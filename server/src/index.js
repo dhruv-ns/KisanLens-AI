@@ -20,6 +20,8 @@ const assistantRoutes = require('./routes/assistantRoutes');
 const authRoutes = require('./routes/authRoutes');
 const yieldRoutes = require('./routes/yieldRoutes');
 const voiceRoutes = require('./routes/voiceRoutes');
+const ivrRoutes = require('./routes/ivrRoutes');
+const briefingRoutes = require('./routes/briefingRoutes');
 
 const app = express();
 
@@ -103,6 +105,8 @@ app.get('/', (req, res) => {
       market: '/api/market',
       assistant: '/api/assistant',
       voice: '/api/voice',
+      ivr: '/api/ivr',
+      briefing: '/api/briefing',
     },
   });
 });
@@ -128,6 +132,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', authRoutes);
 app.use('/api/yield', yieldRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/ivr', ivrRoutes);
+app.use('/api/briefing', briefingRoutes);
 
 // 404 handler
 app.use('/api/*path', (req, res) => {

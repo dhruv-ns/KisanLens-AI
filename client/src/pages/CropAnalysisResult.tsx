@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, Camera, History, AlertTriangle, CheckCircle, XCircle, Info, Shield, Volume2, Square, Sparkles } from 'lucide-react';
+import { ArrowLeft, Camera, History, AlertTriangle, CheckCircle, XCircle, Info, Shield, Volume2, Square, Sparkles, Mic } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cropApi, voiceApi } from '../services/api';
 import { CardSkeleton } from '../components/LoadingSkeleton';
@@ -78,7 +78,23 @@ export default function CropAnalysisResult() {
 
     const fullText = `${analysis.crop}${punct} ${pfx.issue}: ${analysis.possibleIssue}${punct} ${pfx.symptoms}: ${obsText}${punct} ${pfx.treatment}: ${actText}${punct} ${analysis.expertAttention || ''}`;
 
-    // Try Gnani Timbre TTS first with browser speech fallback
+    // 1. If backend already pre-synthesized the audio via Gnani Timbre, play immediately!
+    if (analysis.audioBase64) {
+      try {
+        const binary = atob(analysis.audioBase64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: analysis.audioContentType || 'audio/wav' });
+        play(blob, fullText, langCode);
+        return;
+      } catch (e) {
+        // Fallback to fetch synthesis
+      }
+    }
+
+    // 2. Try Gnani Timbre TTS first with browser speech fallback
     try {
       setAudioLoading(true);
       const audioBlob = await voiceApi.synthesize(fullText.slice(0, 1000), langCode);
@@ -104,6 +120,30 @@ export default function CropAnalysisResult() {
           <span>{analysis.provider || 'Gnani AI'}</span>
         </div>
       </div>
+
+      {/* Multimodal Voice Question Banner (Gnani Prisma STT) */}
+      {analysis.userVoiceQuery && (
+        <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-green-50 border border-emerald-300 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Mic className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-emerald-900 uppercase tracking-wider">
+                  {analysis.language === 'en' ? 'Farmer Voice Question' : 'किसान द्वारा पूछा गया सवाल'}
+                </span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800 border border-emerald-300">
+                  Gnani Prisma STT
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-emerald-950 mt-1 italic leading-snug">
+                "{analysis.userVoiceQuery}"
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Voice Reader Button for Farmers */}
       <button

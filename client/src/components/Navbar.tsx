@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Leaf, Globe } from 'lucide-react';
+import { Leaf, Globe, PhoneCall } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Navbar() {
@@ -14,7 +14,7 @@ export default function Navbar() {
     { path: '/weather', label: t('nav.weather') },
     { path: '/market', label: t('nav.market') },
     { path: '/assistant', label: t('nav.assistant') },
-    { path: '/history', label: t('nav.history') },
+    { path: '/ivr-helpline', label: 'IVR Helpline' },
     { path: '/farm', label: t('nav.farm') },
   ];
 
@@ -44,14 +44,25 @@ export default function Navbar() {
           ))}
         </div>
 
-        <button
-          onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--color-border)] hover:bg-gray-50 transition-colors cursor-pointer bg-white"
-          aria-label="Toggle language"
-        >
-          <Globe className="w-4 h-4" />
-          {language === 'en' ? 'हिंदी' : 'ENG'}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/ivr-helpline"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold no-underline transition-colors"
+          >
+            <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="hidden sm:inline">1800-889-KISAN</span>
+            <span className="sm:hidden">IVR</span>
+          </Link>
+
+          <button
+            onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--color-border)] hover:bg-gray-50 transition-colors cursor-pointer bg-white"
+            aria-label="Toggle language"
+          >
+            <Globe className="w-4 h-4" />
+            {language === 'en' ? 'हिंदी' : 'ENG'}
+          </button>
+        </div>
       </div>
     </nav>
   );

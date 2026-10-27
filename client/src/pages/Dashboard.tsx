@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Camera, Cloud, Store, MessageCircle, MapPin, Thermometer, Droplets, Wind, AlertTriangle, TrendingUp, Leaf, ArrowRight, Sprout } from 'lucide-react';
+import { Camera, Cloud, Store, MessageCircle, MapPin, Thermometer, Droplets, Wind, AlertTriangle, TrendingUp, Leaf, ArrowRight, Sprout, PhoneCall, Radio } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useFarm } from '../contexts/FarmContext';
 import { weatherApi, marketApi, farmApi, cropApi } from '../services/api';
 import { CardSkeleton } from '../components/LoadingSkeleton';
+import DailyBriefingCard from '../components/DailyBriefingCard';
 
 export default function Dashboard() {
   const { t, language } = useLanguage();
@@ -76,14 +77,18 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* Daily Code-Mixed Audio Briefing (Mixed Vibes Award) */}
+      <DailyBriefingCard farm={farm} />
+
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 md:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 md:gap-3">
         {[
           { to: '/crop-scanner', icon: Camera, label: t('dashboard.scanCrop'), color: 'bg-green-50 text-green-700 border-green-200' },
           { to: '/yield-prediction', icon: Sprout, label: language === 'en' ? 'Predict Yield' : 'पैदावार अनुमान', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
           { to: '/weather', icon: Cloud, label: t('dashboard.checkWeather'), color: 'bg-blue-50 text-blue-700 border-blue-200' },
           { to: '/market', icon: Store, label: t('dashboard.viewMarket'), color: 'bg-amber-50 text-amber-700 border-amber-200' },
           { to: '/assistant', icon: MessageCircle, label: t('dashboard.askAI'), color: 'bg-purple-50 text-purple-700 border-purple-200' },
+          { to: '/ivr-helpline', icon: PhoneCall, label: '1800-889-KISAN', color: 'bg-teal-50 text-teal-700 border-teal-200' },
         ].map(({ to, icon: Icon, label, color }) => (
           <Link
             key={to}

@@ -4,7 +4,8 @@ const { analyzeCrop, getCropHistory, getCropAnalysis } = require('../controllers
 const upload = require('../middleware/upload');
 const { auth } = require('../middleware/auth');
 
-router.post('/analyze', auth, upload.single('image'), analyzeCrop);
+const uploadMiddleware = upload.uploadCropMultimodal || upload.single('image');
+router.post('/analyze', auth, uploadMiddleware, analyzeCrop);
 router.get('/history', auth, getCropHistory);
 router.get('/:id', auth, getCropAnalysis);
 

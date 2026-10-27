@@ -1,4 +1,4 @@
-const { analyzeCrop: gnaniAnalyzeCrop } = require('../services/gnaniService');
+const { analyzeCrop: gnaniAnalyzeCrop, transcribeAudio, synthesizeSpeech, isGnaniConfigured } = require('../services/gnaniService');
 const CropAnalysis = require('../models/CropAnalysis');
 const { isDBConnected } = require('../config/database');
 const { uploadToImageKit } = require('../utils/imagekit');
@@ -7,37 +7,85 @@ const fs = require('fs');
 
 /**
  * POST /api/crops/analyze
- * Diagnoses crop health using Gnani AI (Evon v3.3)
+ * Diagnoses crop health using Multimodal Voice + Image AI (Gnani Prisma STT + Evon + Timbre TTS)
  */
 async function analyzeCrop(req, res, next) {
+  const imageFile = req.files?.image?.[0] || req.file;
+  const audioFile = req.files?.audio?.[0];
+
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: 'No image uploaded.' });
+    if (!imageFile) {
+      return res.status(400).json({ success: false, error: 'No crop image uploaded. Please provide an image.' });
     }
 
     const crop = req.body.crop || 'Unknown';
-    const symptoms = req.body.symptoms || req.body.notes || '';
+    let symptoms = req.body.symptoms || req.body.notes || '';
     const language = req.body.language || 'hi';
-    const imagePath = req.file.path;
+    const imagePath = imageFile.path;
 
-    logger.info(`Analyzing crop image via Gnani AI: ${crop}, lang: ${language}, file: ${req.file.filename}`);
+    // Multimodal Voice Processing: transcribe farmer's spoken query via Gnani Prisma STT
+    let userVoiceQuery = null;
+    if (audioFile && isGnaniConfigured()) {
+      try {
+        const audioBuffer = fs.readFileSync(audioFile.path);
+        logger.info(`[Multimodal Crop Diagnostics] Transcribing voice question: ${audioBuffer.length} bytes, lang=${language}`);
+        const sttResult = await transcribeAudio(
+          audioBuffer,
+          audioFile.originalname || 'voice_question.wav',
+          language
+        );
+        if (sttResult?.transcript && sttResult.transcript.trim()) {
+          userVoiceQuery = sttResult.transcript.trim();
+          symptoms = symptoms
+            ? `${symptoms} | Farmer Voice Question: "${userVoiceQuery}"`
+            : `Farmer Voice Question: "${userVoiceQuery}"`;
+          logger.info(`[Multimodal Crop Diagnostics] Transcribed farmer question: "${userVoiceQuery}"`);
+        }
+      } catch (voiceErr) {
+        logger.warn('Failed to transcribe crop voice note, continuing with image analysis:', voiceErr.message);
+      } finally {
+        try { fs.unlinkSync(audioFile.path); } catch (e) { /* ignore */ }
+      }
+    }
 
-    // Call Gnani AI Crop Diagnostic Engine with regional language
+    logger.info(`Analyzing crop image via Gnani AI: ${crop}, lang: ${language}, file: ${imageFile.filename}`);
+
+    // Call Gnani AI Crop Diagnostic Engine with regional language and multimodal symptoms
     const analysis = await gnaniAnalyzeCrop(imagePath, crop, symptoms, {
       location: req.body.location,
       language,
+      userVoiceQuery,
     });
 
     // Upload image to ImageKit
-    let imageUrl = `/uploads/${req.file.filename}`; // fallback
+    let imageUrl = `/uploads/${imageFile.filename}`; // fallback
     try {
-      const { url } = await uploadToImageKit(imagePath, req.file.filename, '/kisanlens/crops');
+      const { url } = await uploadToImageKit(imagePath, imageFile.filename, '/kisanlens/crops');
       imageUrl = url;
       logger.info(`Image uploaded to ImageKit: ${url}`);
       // Clean up local temp file only when remote upload succeeded
       try { fs.unlinkSync(imagePath); } catch (e) { /* ignore */ }
     } catch (ikErr) {
       logger.warn('ImageKit upload failed, keeping local file for fallback:', ikErr.message);
+    }
+
+    // Auto-synthesize voice response using Gnani Timbre TTS
+    let audioBase64 = null;
+    let audioContentType = 'audio/wav';
+    const effectiveLang = analysis.language || language;
+    if (isGnaniConfigured() && req.body.wantAudio !== 'false') {
+      try {
+        const obsFirst = Array.isArray(analysis.observations) ? analysis.observations[0] : '';
+        const actFirst = Array.isArray(analysis.recommendedActions) ? analysis.recommendedActions[0] : '';
+        const spokenScript = `${analysis.crop}। समस्या: ${analysis.possibleIssue}। मुख्य लक्षण: ${obsFirst}। अनुशंसित उपचार: ${actFirst}। ${analysis.expertAttention || ''}`;
+        const synthRes = await synthesizeSpeech(spokenScript.slice(0, 1000), effectiveLang);
+        if (synthRes?.audioBuffer) {
+          audioBase64 = synthRes.audioBuffer.toString('base64');
+          audioContentType = synthRes.contentType || 'audio/wav';
+        }
+      } catch (synthErr) {
+        logger.warn('Pre-synthesis of crop diagnosis audio warning:', synthErr.message);
+      }
     }
 
     // Save to database if connected
@@ -56,7 +104,9 @@ async function analyzeCrop(req, res, next) {
           recommendedActions: analysis.recommendedActions,
           expertAttention: analysis.expertAttention,
           imageQuality: analysis.imageQuality,
-          additionalNotes: analysis.additionalNotes,
+          additionalNotes: userVoiceQuery
+            ? `${analysis.additionalNotes || ''} [Farmer Query: ${userVoiceQuery}]`.trim()
+            : analysis.additionalNotes,
         });
         await record.save();
         recordId = record._id;
@@ -76,16 +126,23 @@ async function analyzeCrop(req, res, next) {
         id: recordId,
         ...analysis,
         imageUrl,
+        userVoiceQuery,
+        hasAudio: Boolean(audioBase64),
+        audioBase64,
+        audioContentType,
         language: analysis.language || language,
         disclaimer: analysis.disclaimer || disclaimer,
-        provider: 'Gnani AI (Evon v3.3)',
+        provider: 'Gnani AI (Prisma STT + Timbre TTS + Evon)',
         analyzedAt: new Date().toISOString(),
       },
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file?.path) {
-      try { fs.unlinkSync(req.file.path); } catch (e) { /* ignore */ }
+    // Clean up uploaded files on error
+    if (imageFile?.path) {
+      try { fs.unlinkSync(imageFile.path); } catch (e) { /* ignore */ }
+    }
+    if (audioFile?.path) {
+      try { fs.unlinkSync(audioFile.path); } catch (e) { /* ignore */ }
     }
     next(error);
   }

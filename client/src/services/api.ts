@@ -228,4 +228,56 @@ export const voiceApi = {
   },
 };
 
+// ====== IVR HELPLINE API (1800-889-KISAN) ======
+export const ivrApi = {
+  /** Get IVR helpline details and quick menu */
+  getInfo: async () => {
+    const res = await api.get('/ivr/info');
+    return res.data;
+  },
+
+  /** Start a virtual telephonic call session */
+  startCall: async (language = 'hi-IN', location?: { latitude?: number; longitude?: number }) => {
+    const res = await api.post('/ivr/start', { language, location });
+    return res.data;
+  },
+
+  /** Send DTMF digit or noisy telephonic voice recording */
+  sendAction: async (params: {
+    digits?: string;
+    audioBlob?: Blob;
+    language?: string;
+    location?: { latitude?: number; longitude?: number; state?: string; district?: string };
+  }) => {
+    const formData = new FormData();
+    if (params.digits) formData.append('digits', params.digits);
+    if (params.language) formData.append('language', params.language);
+    if (params.location) formData.append('location', JSON.stringify(params.location));
+    if (params.audioBlob) {
+      formData.append('audio', params.audioBlob, 'telephonic_voice.wav');
+    }
+
+    const res = await api.post('/ivr/action', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000,
+    });
+    return res.data;
+  },
+};
+
+// ====== DAILY CODE-MIXED BRIEFING API ("Kisan Vani") ======
+export const briefingApi = {
+  /** Fetch personalized daily code-mixed audio briefing */
+  getDailyBriefing: async (params?: {
+    crop?: string;
+    farmName?: string;
+    city?: string;
+    state?: string;
+    languageStyle?: 'hinglish' | 'hindi' | 'english';
+  }) => {
+    const res = await api.post('/briefing/daily', params || {});
+    return res.data;
+  },
+};
+
 export default api;

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Upload, X, Loader2, AlertCircle, Image as ImageIcon, Languages } from 'lucide-react';
+import { Camera, Upload, X, Loader2, AlertCircle, Image as ImageIcon, Languages, Mic, MicOff, Square, Play, Trash2, Volume2, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
 import { cropApi } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -36,6 +37,20 @@ export default function CropScanner() {
   const [progressText, setProgressText] = useState('');
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
+
+  // Multimodal Voice Diagnostics (Gnani Prisma STT)
+  const recorder = useVoiceRecorder(30000);
+
+  useEffect(() => {
+    if (recorder.audioBlob) {
+      const url = URL.createObjectURL(recorder.audioBlob);
+      setAudioPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setAudioPreviewUrl(null);
+    }
+  }, [recorder.audioBlob]);
 
   // Sync default report language if app language changes
   useEffect(() => {
@@ -43,8 +58,18 @@ export default function CropScanner() {
   }, [language]);
 
   const progressMessages = reportLanguage === 'en'
-    ? ['Uploading image...', 'Examining visible symptoms...', 'Analyzing crop health...', 'Preparing regional recommendations...']
-    : ['तस्वीर अपलोड हो रही है...', 'रोग व कीट लक्षणों की जांच...', 'फसल स्वास्थ्य का विश्लेषण...', 'क्षेत्रीय भाषा में सिफारिशें तैयार हो रही हैं...'];
+    ? [
+        'Uploading image & voice question...',
+        'Transcribing voice via Gnani Prisma STT...',
+        'Analyzing crop health & leaf symptoms...',
+        'Synthesizing voice diagnosis via Gnani Timbre...',
+      ]
+    : [
+        'तस्वीर व आवाज अपलोड हो रही है...',
+        'Gnani Prisma STT द्वारा आवाज का विश्लेषण...',
+        'फसल रोग व लक्षणों की जांच...',
+        'Gnani Timbre द्वारा वॉयस रिपोर्ट तैयार...',
+      ];
 
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) return language === 'en' ? 'Invalid file type. Please use JPG, PNG, or WEBP.' : 'अमान्य फ़ाइल प्रकार। कृपया JPG, PNG, या WEBP का उपयोग करें।';
@@ -92,6 +117,11 @@ export default function CropScanner() {
       formData.append('image', imageFile);
       formData.append('crop', selectedCrop);
       formData.append('language', reportLanguage);
+
+      // Multimodal Voice Diagnostics: attach farmer voice note if recorded
+      if (recorder.audioBlob) {
+        formData.append('audio', recorder.audioBlob, 'farmer_voice_query.wav');
+      }
 
       const result = await cropApi.analyze(formData);
       clearInterval(interval);
@@ -240,6 +270,90 @@ export default function CropScanner() {
           </div>
         </div>
       )}
+
+      {/* Multimodal Voice Note (Gnani Prisma STT) */}
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-200/80 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+              <Mic className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-emerald-950 flex items-center gap-1.5">
+                <span>{language === 'en' ? 'Voice Question' : 'बोलकर सवाल पूछें'}</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800">
+                  Gnani Prisma STT
+                </span>
+              </h2>
+              <p className="text-[11px] text-emerald-800/80">
+                {language === 'en'
+                  ? 'Ask a question with your photo (e.g. "What is this brown spot?")'
+                  : 'फोटो के साथ सवाल बोलें (उदा. "पत्तियों पर यह भूरा धब्बा क्या है?")'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {recorder.isRecording ? (
+          <div className="flex items-center justify-between bg-white/90 backdrop-blur rounded-xl p-3 border border-red-200">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-red-600 animate-ping" />
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-bold text-red-700">Recording...</span>
+                <span className="text-xs font-mono text-gray-600">
+                  {Math.floor(recorder.duration / 1000)}s / 30s
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => recorder.stopRecording()}
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm cursor-pointer border-none"
+            >
+              <Square className="w-3.5 h-3.5 fill-white" />
+              <span>{language === 'en' ? 'Stop' : 'रोकें'}</span>
+            </button>
+          </div>
+        ) : recorder.audioBlob ? (
+          <div className="bg-white/95 rounded-xl p-3 border border-emerald-200 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <Volume2 className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-emerald-950 truncate">
+                  {language === 'en' ? 'Voice note recorded' : 'वॉयस नोट रिकॉर्ड हो गया'}
+                </p>
+                {audioPreviewUrl && (
+                  <audio src={audioPreviewUrl} controls className="h-7 w-48 mt-1" />
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                recorder.cancelRecording();
+                setAudioPreviewUrl(null);
+              }}
+              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer border-none bg-transparent"
+              title="Delete voice note"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => recorder.startRecording()}
+            className="w-full py-2.5 px-3 bg-white hover:bg-emerald-100/50 text-emerald-900 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-emerald-300 transition-all cursor-pointer shadow-2xs"
+          >
+            <Mic className="w-4 h-4 text-emerald-600 animate-bounce" />
+            <span>
+              {language === 'en' ? 'Tap to Record Voice Question (Optional)' : 'आवाज में सवाल रिकॉर्ड करें (वैकल्पिक)'}
+            </span>
+          </button>
+        )}
+      </div>
 
       {/* Error */}
       {error && (
