@@ -19,6 +19,13 @@ const config = {
     evonEnabled: process.env.GNANI_EVON_ENABLED !== 'false', // Enabled by default
   },
 
+  // NVIDIA NIM — Vision-Language Model for actual crop image analysis
+  nvidia: {
+    apiKey: process.env.NVIDIA_API_KEY || '',
+    baseUrl: process.env.NVIDIA_BASE_URL || 'https://integrate.api.nvidia.com/v1',
+    visionModel: process.env.NVIDIA_VISION_MODEL || 'nvidia/nemotron-3.5-super-vl-120b-a12b',
+  },
+
   // Legacy reference (deprecated)
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',

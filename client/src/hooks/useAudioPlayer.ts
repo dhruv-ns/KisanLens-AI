@@ -93,8 +93,13 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       animFrameRef.current = null;
     }
     if (audioRef.current) {
+      // Crucial: Clear all event listeners BEFORE pausing and removing src to avoid triggering onerror
+      audioRef.current.onloadedmetadata = null;
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current.onplay = null;
       audioRef.current.pause();
-      audioRef.current.src = '';
+      audioRef.current.removeAttribute('src');
       audioRef.current = null;
     }
     if (objectUrlRef.current) {
@@ -219,6 +224,13 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       audio.playbackRate = 1.0;
       audio.src = finalSrc;
 
+      let hasStarted = false;
+      let hasEnded = false;
+
+      audio.onplay = () => {
+        hasStarted = true;
+      };
+
       audio.onloadedmetadata = () => {
         audio.playbackRate = 1.0;
         setState(prev => ({
@@ -232,6 +244,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       };
 
       audio.onended = () => {
+        hasEnded = true;
         setState(prev => ({
           ...prev,
           isPlaying: false,
@@ -242,6 +255,11 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       };
 
       audio.onerror = (e) => {
+        // Prevent fallback if audio has already completed or was playing
+        if (hasEnded || hasStarted) {
+          cleanupAudio();
+          return;
+        }
         console.warn('Audio element error, falling back:', e);
         cleanupAudio();
         if (fallbackText) {

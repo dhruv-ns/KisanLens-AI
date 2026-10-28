@@ -132,7 +132,7 @@ async function analyzeCrop(req, res, next) {
         audioContentType,
         language: analysis.language || language,
         disclaimer: analysis.disclaimer || disclaimer,
-        provider: 'Gnani AI (Prisma STT + Timbre TTS + Evon)',
+        provider: analysis.provider || 'Gnani AI (Prisma STT + Timbre TTS + Evon)',
         analyzedAt: new Date().toISOString(),
       },
     });

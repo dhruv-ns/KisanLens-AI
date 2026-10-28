@@ -1,4 +1,5 @@
 const axios = require('axios');
+const fs = require('fs');
 const FormData = require('form-data');
 const config = require('../config');
 const logger = require('../utils/logger');
@@ -436,7 +437,11 @@ Respond strictly in valid JSON format with NO markdown wrapping, matching this s
 }`;
 
 /**
- * Analyze a crop issue using Gnani AI (Evon v3.3) with regional language support
+ * Analyze a crop issue using NVIDIA NIM Vision-Language Model (Nemotron 3.5 Super VL)
+ * with fallback to Gnani Evon text-only analysis.
+ *
+ * This function ACTUALLY reads the uploaded image, converts it to base64,
+ * and sends it to the vision model for genuine image-based crop diagnosis.
  *
  * @param {string} imagePath     Path to uploaded image
  * @param {string} crop          Crop name
@@ -446,7 +451,7 @@ Respond strictly in valid JSON format with NO markdown wrapping, matching this s
  */
 async function analyzeCrop(imagePath, crop = 'Unknown', symptoms = '', context = {}) {
   const cropName = crop || 'Unknown';
-  const cleanSymptoms = symptoms || 'Visual symptoms observed on foliage/stem.';
+  const cleanSymptoms = symptoms || '';
   const location = context.location || 'India';
   const season = getCurrentSeason();
 
@@ -454,9 +459,41 @@ async function analyzeCrop(imagePath, crop = 'Unknown', symptoms = '', context =
   const rawLang = (context.language || 'hi').toLowerCase().trim();
   const langMeta = LANGUAGE_META[rawLang] || LANGUAGE_META['hi'];
 
+  // ── Step 1: Read the actual image and convert to base64 ──
+  let imageBase64 = null;
+  let imageMimeType = 'image/jpeg';
+  try {
+    const imageBuffer = fs.readFileSync(imagePath);
+    imageBase64 = imageBuffer.toString('base64');
+    // Detect mime type from file extension
+    const ext = imagePath.split('.').pop()?.toLowerCase();
+    if (ext === 'png') imageMimeType = 'image/png';
+    else if (ext === 'webp') imageMimeType = 'image/webp';
+    else imageMimeType = 'image/jpeg';
+    logger.info(`[Crop Vision] Image loaded: ${imageBuffer.length} bytes, type: ${imageMimeType}`);
+  } catch (readErr) {
+    logger.warn(`[Crop Vision] Could not read image file: ${readErr.message}`);
+  }
+
+  // ── Step 2: Try NVIDIA NIM Vision Model (Nemotron 3.5 Super VL) ──
+  const nvidiaKey = config.nvidia?.apiKey;
+  if (imageBase64 && nvidiaKey && nvidiaKey.length > 5) {
+    try {
+      logger.info(`[Crop Vision] Sending image to NVIDIA NIM Nemotron 3.5 Super VL for real analysis...`);
+      const visionResult = await analyzeImageWithNvidia(imageBase64, imageMimeType, cropName, cleanSymptoms, location, season, langMeta);
+      if (visionResult) {
+        logger.info(`[Crop Vision] NVIDIA NIM vision analysis succeeded: ${visionResult.possibleIssue}`);
+        return visionResult;
+      }
+    } catch (nvidiaErr) {
+      logger.warn(`[Crop Vision] NVIDIA NIM vision failed: ${nvidiaErr.message}. Trying Evon text fallback...`);
+    }
+  }
+
+  // ── Step 3: Fallback to Gnani Evon text-only (no image) ──
   const prompt = CROP_DIAGNOSIS_PROMPT
     .replace(/\{\{crop\}\}/g, cropName)
-    .replace('{{symptoms}}', cleanSymptoms)
+    .replace('{{symptoms}}', cleanSymptoms || 'Visual symptoms observed on foliage/stem.')
     .replace('{{location}}', location)
     .replace('{{season}}', season)
     .replace(/\{\{targetLanguageName\}\}/g, langMeta.name)
@@ -517,6 +554,140 @@ async function analyzeCrop(imagePath, crop = 'Unknown', symptoms = '', context =
 
   // Fallback: Calibrated ICAR Indian Agronomic Diagnostic Knowledge Base in regional language
   return generateICARCropDiagnosis(cropName, cleanSymptoms, season, rawLang);
+}
+
+// ─────────────────────────────────────────────
+// 4b. NVIDIA NIM Vision Analysis (Nemotron 3.5 Super VL 120B)
+// ─────────────────────────────────────────────
+
+/**
+ * Send crop image to NVIDIA NIM Nemotron 3.5 Super VL for real vision-based analysis.
+ * Uses the OpenAI-compatible API with image_url content parts.
+ */
+async function analyzeImageWithNvidia(imageBase64, mimeType, cropName, symptoms, location, season, langMeta) {
+  const nvidiaBaseUrl = config.nvidia.baseUrl || 'https://integrate.api.nvidia.com/v1';
+  const nvidiaModel = config.nvidia.visionModel || 'nvidia/nemotron-3.5-super-vl-120b-a12b';
+
+  const visionPrompt = `You are an expert plant pathologist and agronomist specializing in Indian agriculture.
+Carefully examine the uploaded crop image and provide a REAL diagnosis based on WHAT YOU ACTUALLY SEE in the image.
+
+CONTEXT:
+- Crop name provided by farmer: ${cropName}
+- Farmer's notes/symptoms: ${symptoms || 'No additional notes provided'}
+- Location: ${location}
+- Season: ${season}
+
+MANDATORY LANGUAGE REQUIREMENT:
+You MUST generate ALL output text in ${langMeta.name} using its native script (${langMeta.native}).
+DO NOT output in English unless the target language is explicitly English.
+
+CRITICAL INSTRUCTIONS:
+- LOOK AT THE IMAGE CAREFULLY. Describe what you actually see — leaf color, spots, lesions, wilting, pest damage, nutrient deficiency signs, etc.
+- If the plant looks healthy, say so clearly. Don't fabricate diseases.
+- If you see specific symptoms, identify the most likely disease, pest, or deficiency.
+- NEVER recommend toxic or restricted chemicals. Prioritize IPM, bio-pesticides (neem oil, Trichoderma), and organic methods.
+- Suggest consulting the nearest Krishi Vigyan Kendra (KVK) for serious issues.
+
+Respond ONLY in valid JSON (no markdown, no code fences) matching this schema:
+{
+  "crop": "Crop name in ${langMeta.name}",
+  "possibleIssue": "Specific disease/pest/deficiency you SEE in the image, in ${langMeta.name}",
+  "confidence": 85,
+  "severity": "healthy" | "low" | "moderate" | "high",
+  "observations": [
+    "What you actually see in the image — symptom 1, in ${langMeta.name}",
+    "What you actually see — symptom 2, in ${langMeta.name}",
+    "Any pattern, color change, or damage visible, in ${langMeta.name}"
+  ],
+  "recommendedActions": [
+    "Immediate treatment step based on your diagnosis, in ${langMeta.name}",
+    "IPM / organic control measure, in ${langMeta.name}",
+    "Prevention for future, in ${langMeta.name}"
+  ],
+  "expertAttention": "When to consult KVK, in ${langMeta.name}",
+  "imageQuality": "good" | "acceptable" | "poor",
+  "additionalNotes": "Any extra practical advice based on what you see, in ${langMeta.name}"
+}`;
+
+  const messages = [
+    {
+      role: 'user',
+      content: [
+        { type: 'text', text: visionPrompt },
+        {
+          type: 'image_url',
+          image_url: {
+            url: `data:${mimeType};base64,${imageBase64}`,
+          },
+        },
+      ],
+    },
+  ];
+
+  const response = await axios.post(
+    `${nvidiaBaseUrl}/chat/completions`,
+    {
+      model: nvidiaModel,
+      messages,
+      temperature: 0.3,
+      top_p: 0.95,
+      max_tokens: 4096,
+      chat_template_kwargs: { enable_thinking: false },
+      stream: false,
+    },
+    {
+      headers: {
+        'Authorization': `Bearer ${config.nvidia.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 60000,
+      maxContentLength: 100 * 1024 * 1024,
+    }
+  );
+
+  let rawText = response.data?.choices?.[0]?.message?.content;
+  if (!rawText) {
+    rawText = response.data?.choices?.[0]?.message?.reasoning_content;
+  }
+  if (!rawText) {
+    throw new Error('No response content from NVIDIA NIM vision model.');
+  }
+
+  // Parse the JSON response — handle possible reasoning/thinking tags or markdown wrapping
+  let jsonText = rawText;
+  jsonText = jsonText.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+  jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+  // Extract JSON object if surrounded by preamble or postscript
+  const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    jsonText = jsonMatch[0];
+  }
+
+  const parsed = JSON.parse(jsonText);
+
+  return {
+    crop: parsed.crop || cropName,
+    possibleIssue: parsed.possibleIssue || 'Visual Assessment',
+    confidence: Math.min(100, Math.max(0, parseInt(parsed.confidence) || 80)),
+    severity: ['healthy', 'low', 'moderate', 'high'].includes(parsed.severity)
+      ? parsed.severity
+      : 'moderate',
+    observations: Array.isArray(parsed.observations) && parsed.observations.length > 0
+      ? parsed.observations
+      : ['Image analysis completed'],
+    recommendedActions: Array.isArray(parsed.recommendedActions) && parsed.recommendedActions.length > 0
+      ? parsed.recommendedActions
+      : ['Consult your nearest KVK for detailed advice'],
+    expertAttention: parsed.expertAttention || 'Consult KVK if symptoms persist.',
+    imageQuality: ['good', 'acceptable', 'poor'].includes(parsed.imageQuality)
+      ? parsed.imageQuality
+      : 'good',
+    language: langMeta.code,
+    languageName: langMeta.name,
+    additionalNotes: parsed.additionalNotes || `AI Vision Analysis powered by NVIDIA NIM (${season})`,
+    provider: 'NVIDIA NIM Nemotron 3.5 Super VL',
+  };
 }
 
 // ─────────────────────────────────────────────
