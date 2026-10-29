@@ -37,9 +37,9 @@ export default function DailyBriefingCard({ farm: propFarm }: DailyBriefingCardP
       const payload: any = { languageStyle: style };
       if (farm?.crop) payload.crop = farm.crop;
       if (farm?.farmName) payload.farmName = farm.farmName;
-      const city = farm?.city || (farm as any)?.location?.city;
+      const city = (farm as any)?.city || (farm as any)?.location?.city;
       if (city) payload.city = city;
-      const state = farm?.state || (farm as any)?.location?.state;
+      const state = (farm as any)?.state || (farm as any)?.location?.state;
       if (state) payload.state = state;
       if (farm?.latitude) payload.latitude = farm.latitude;
       if (farm?.longitude) payload.longitude = farm.longitude;
@@ -62,9 +62,9 @@ export default function DailyBriefingCard({ farm: propFarm }: DailyBriefingCardP
   }, [
     farm?.crop,
     (farm as any)?.location?.city,
-    farm?.city,
+    (farm as any)?.city,
     (farm as any)?.location?.state,
-    farm?.state,
+    (farm as any)?.state,
     farm?.latitude,
     farm?.longitude,
     farm?.cropStage,
