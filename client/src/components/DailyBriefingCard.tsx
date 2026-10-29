@@ -106,11 +106,11 @@ export default function DailyBriefingCard({ farm: propFarm }: DailyBriefingCardP
       {/* Top Header Row */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold border border-amber-300/80 shadow-2xs">
-            <Award className="w-3.5 h-3.5 text-amber-600" />
-            <span>Mixed Vibes Award Contender</span>
-            <span className="text-[10px] bg-amber-200/80 px-1.5 py-0.2 rounded font-mono">Gnani Timbre</span>
-          </div>
+          {/* <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold border border-amber-300/80 shadow-2xs"> */}
+            {/* <Award className="w-3.5 h-3.5 text-amber-600" /> */}
+            {/* <span>Mixed Vibes Award Contender</span> */}
+            {/* <span className="text-[10px] bg-amber-200/80 px-1.5 py-0.2 rounded font-mono">Gnani Timbre</span> */}
+          {/* </div> */}
           <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
             <span>Kisan Vani: Daily Audio Briefing</span>
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />

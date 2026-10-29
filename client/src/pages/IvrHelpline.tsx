@@ -328,10 +328,10 @@ export default function IvrHelpline() {
         <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/30">
+            {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/30">
               <Award className="w-3.5 h-3.5 text-amber-400" />
               <span>Contending for Noise Canceller Award</span>
-            </div>
+            </div> */}
             <h1 className="text-3xl font-extrabold tracking-tight">
               Telephonic IVR Helpline <span className="text-emerald-400 font-mono">1800-889-KISAN</span>
             </h1>
