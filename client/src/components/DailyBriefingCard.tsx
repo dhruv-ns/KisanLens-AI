@@ -4,12 +4,15 @@ import { briefingApi } from '../services/api';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import toast from 'react-hot-toast';
 
+import { useFarm } from '../contexts/FarmContext';
+
 interface DailyBriefingCardProps {
   farm?: {
     crop?: string;
     farmName?: string;
     city?: string;
     state?: string;
+    location?: { city?: string; state?: string; district?: string };
     latitude?: number;
     longitude?: number;
     area?: number;
@@ -17,7 +20,10 @@ interface DailyBriefingCardProps {
   } | null;
 }
 
-export default function DailyBriefingCard({ farm }: DailyBriefingCardProps) {
+export default function DailyBriefingCard({ farm: propFarm }: DailyBriefingCardProps) {
+  const { farm: contextFarm } = useFarm();
+  const farm = propFarm || contextFarm;
+
   const [briefing, setBriefing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeStyle, setActiveStyle] = useState<'hinglish' | 'hindi' | 'english'>('hinglish');
@@ -28,18 +34,19 @@ export default function DailyBriefingCard({ farm }: DailyBriefingCardProps) {
   const loadBriefing = async (style: 'hinglish' | 'hindi' | 'english' = activeStyle) => {
     setLoading(true);
     try {
-      const city = farm?.city || (farm as any)?.location?.city || 'Indore';
-      const state = farm?.state || (farm as any)?.location?.state || 'Madhya Pradesh';
-      const res = await briefingApi.getDailyBriefing({
-        crop: farm?.crop || 'Wheat',
-        farmName: farm?.farmName || 'My Farm',
-        city,
-        state,
-        latitude: farm?.latitude,
-        longitude: farm?.longitude,
-        cropStage: farm?.cropStage || 'Vegetative Growth',
-        languageStyle: style,
-      });
+      const payload: any = { languageStyle: style };
+      if (farm?.crop) payload.crop = farm.crop;
+      if (farm?.farmName) payload.farmName = farm.farmName;
+      const city = farm?.city || (farm as any)?.location?.city;
+      if (city) payload.city = city;
+      const state = farm?.state || (farm as any)?.location?.state;
+      if (state) payload.state = state;
+      if (farm?.latitude) payload.latitude = farm.latitude;
+      if (farm?.longitude) payload.longitude = farm.longitude;
+      if (farm?.cropStage) payload.cropStage = farm.cropStage;
+      if (farm?.area) payload.area = farm.area;
+
+      const res = await briefingApi.getDailyBriefing(payload);
       if (res?.data) {
         setBriefing(res.data);
       }
@@ -52,7 +59,7 @@ export default function DailyBriefingCard({ farm }: DailyBriefingCardProps) {
 
   useEffect(() => {
     loadBriefing(activeStyle);
-  }, [farm, activeStyle]);
+  }, [farm?.crop, (farm as any)?.location?.city, farm?.city, (farm as any)?.location?.state, farm?.state, farm?.cropStage, farm?.farmName, activeStyle]);
 
   // Handle Play/Stop of synthesized audio
   const handleToggleAudio = () => {

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useFarm } from '../contexts/FarmContext';
+import { weatherApi } from '../services/api';
 import { Save, Loader2, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -21,8 +22,47 @@ export default function FarmProfile() {
     soilType: farm?.soilType || '',
   });
 
+  // Sync form when farm profile loads or updates in context
+  useEffect(() => {
+    if (farm) {
+      setForm({
+        farmName: farm.farmName || '',
+        crop: farm.crop || '',
+        cropStage: farm.cropStage || '',
+        area: farm.area || '',
+        areaUnit: farm.areaUnit || 'acres',
+        location: {
+          city: farm.location?.city || '',
+          state: farm.location?.state || '',
+        },
+        soilType: farm.soilType || '',
+      });
+    }
+  }, [farm]);
+
   const handleSave = async () => {
-    await saveFarm({ ...form, area: parseFloat(form.area as any) || 0 });
+    let lat = farm?.latitude;
+    let lon = farm?.longitude;
+
+    // Automatically resolve coordinates for user's city if missing
+    if (form.location.city && (!lat || !lon)) {
+      try {
+        const geoRes = await weatherApi.searchLocation(form.location.city);
+        if (geoRes?.data && geoRes.data.length > 0) {
+          lat = geoRes.data[0].latitude;
+          lon = geoRes.data[0].longitude;
+        }
+      } catch (e) {
+        // Continue saving even if geocoding times out
+      }
+    }
+
+    await saveFarm({
+      ...form,
+      area: parseFloat(form.area as any) || 0,
+      latitude: lat,
+      longitude: lon,
+    });
     toast.success(t('farm.saved'));
   };
 
