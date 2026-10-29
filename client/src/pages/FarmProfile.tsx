@@ -18,7 +18,10 @@ export default function FarmProfile() {
     cropStage: farm?.cropStage || '',
     area: farm?.area || '',
     areaUnit: farm?.areaUnit || 'acres',
-    location: { city: farm?.location?.city || '', state: farm?.location?.state || '' },
+    location: {
+      city: farm?.city || farm?.location?.city || '',
+      state: farm?.state || farm?.location?.state || '',
+    },
     soilType: farm?.soilType || '',
   });
 
@@ -32,8 +35,8 @@ export default function FarmProfile() {
         area: farm.area || '',
         areaUnit: farm.areaUnit || 'acres',
         location: {
-          city: farm.location?.city || '',
-          state: farm.location?.state || '',
+          city: farm.city || farm.location?.city || '',
+          state: farm.state || farm.location?.state || '',
         },
         soilType: farm.soilType || '',
       });
@@ -41,27 +44,42 @@ export default function FarmProfile() {
   }, [farm]);
 
   const handleSave = async () => {
-    let lat = farm?.latitude;
-    let lon = farm?.longitude;
+    let lat = null;
+    let lon = null;
 
-    // Automatically resolve coordinates for user's city if missing
-    if (form.location.city && (!lat || !lon)) {
+    const trimmedCity = form.location.city?.trim() || '';
+    const trimmedState = form.location.state?.trim() || '';
+    const searchQuery = trimmedCity ? `${trimmedCity}${trimmedState ? ', ' + trimmedState : ''}` : trimmedState;
+
+    // Automatically resolve coordinates for user's city/state
+    if (searchQuery) {
       try {
-        const geoRes = await weatherApi.searchLocation(form.location.city);
+        const geoRes = await weatherApi.searchLocation(searchQuery);
         if (geoRes?.data && geoRes.data.length > 0) {
           lat = geoRes.data[0].latitude;
           lon = geoRes.data[0].longitude;
         }
       } catch (e) {
-        // Continue saving even if geocoding times out
+        console.warn('Geocoding notice:', e);
       }
     }
 
+    // Preserve existing coords if geocoding didn't return new ones
+    if (!lat && farm?.latitude) lat = farm.latitude;
+    if (!lon && farm?.longitude) lon = farm.longitude;
+
     await saveFarm({
       ...form,
+      city: trimmedCity,
+      state: trimmedState,
+      location: {
+        city: trimmedCity,
+        state: trimmedState,
+        district: trimmedCity,
+      },
       area: parseFloat(form.area as any) || 0,
-      latitude: lat,
-      longitude: lon,
+      latitude: lat || undefined,
+      longitude: lon || undefined,
     });
     toast.success(t('farm.saved'));
   };

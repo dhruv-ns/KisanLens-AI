@@ -202,21 +202,33 @@ function buildDynamicFallbackBroadcast(ctx, style) {
 async function generateDailyBriefing(farm = {}, languageStyle = 'hinglish') {
   const crop = farm.crop || 'Wheat';
   const farmName = farm.farmName || 'My Farm';
-  let locationName = farm.city || farm.location?.city || farm.state || farm.location?.state || 'Karnal';
-  let state = farm.state || farm.location?.state || 'Haryana';
+  const city = (farm.city || farm.location?.city || '').trim();
+  const state = (farm.state || farm.location?.state || '').trim();
+
+  // Combine into a clean, spoken location name
+  let locationName = '';
+  if (city && state) {
+    locationName = `${city}, ${state}`;
+  } else if (city) {
+    locationName = city;
+  } else if (state) {
+    locationName = state;
+  } else {
+    locationName = 'Karnal, Haryana';
+  }
+
   let lat = farm.latitude ? parseFloat(farm.latitude) : null;
   let lon = farm.longitude ? parseFloat(farm.longitude) : null;
   const cropStage = farm.cropStage || 'Vegetative Growth';
 
-  // If coordinates are missing, resolve them via geocoding
-  if (!lat || !lon) {
+  // Always resolve accurate coordinates for the specific city / state
+  if ((!lat || !lon) && (city || state)) {
     try {
-      const geoResults = await searchLocation(locationName);
+      const geoQuery = city ? `${city}${state ? ', ' + state : ''}` : state;
+      const geoResults = await searchLocation(geoQuery);
       if (geoResults && geoResults.length > 0) {
         lat = geoResults[0].latitude;
         lon = geoResults[0].longitude;
-        locationName = geoResults[0].name || locationName;
-        state = geoResults[0].state || state;
       }
     } catch (geoErr) {
       logger.warn('[Daily Briefing] Geocoding fallback:', geoErr.message);
@@ -257,16 +269,16 @@ async function generateDailyBriefing(farm = {}, languageStyle = 'hinglish') {
     logger.warn('[Daily Briefing] Weather fetch fallback:', err.message);
   }
 
-  // 2. Fetch Real Mandi Market Price
+  // 2. Fetch Real Mandi Market Price for this crop and location
   let modalPrice = 2400;
-  let marketName = `${locationName} Mandi`;
+  let marketName = `${city || locationName} APMC Mandi`;
   let trendDirection = 'stable';
   let trendChange = 0;
   let minPrice = modalPrice - 150;
   let maxPrice = modalPrice + 200;
 
   try {
-    const marketResult = await getMarketData(crop, state, farm.city || farm.location?.city);
+    const marketResult = await getMarketData(crop, state, city);
     if (marketResult?.data && marketResult.data.length > 0) {
       const trend = getMarketTrend(marketResult.data);
       if (trend?.latestPrice) {

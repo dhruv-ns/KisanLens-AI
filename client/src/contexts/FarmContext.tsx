@@ -9,6 +9,8 @@ interface FarmData {
   area: number;
   areaUnit: string;
   location: { city?: string; state?: string; district?: string };
+  city?: string;
+  state?: string;
   latitude?: number;
   longitude?: number;
   soilType?: string;
@@ -39,7 +41,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       const res = await farmApi.get();
-      if (res.data) {
+      if (res?.data) {
         setFarm(res.data);
         localStorage.setItem('kisanlens_farm', JSON.stringify(res.data));
       }
@@ -57,8 +59,9 @@ export function FarmProvider({ children }: { children: ReactNode }) {
       const res = farm?._id
         ? await farmApi.update(updatedFarm)
         : await farmApi.create(updatedFarm);
-      setFarm(res.data);
-      localStorage.setItem('kisanlens_farm', JSON.stringify(res.data));
+      const savedData = res?.data || updatedFarm;
+      setFarm(savedData);
+      localStorage.setItem('kisanlens_farm', JSON.stringify(savedData));
     } catch {
       // Save locally even if server fails
       const updatedFarm = { ...farm, ...data } as FarmData;

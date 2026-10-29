@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 
 const farmSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false, index: true },
   farmName: { type: String, trim: true, default: 'My Farm' },
+  city: { type: String, trim: true },
+  state: { type: String, trim: true },
   location: {
     city: { type: String, trim: true },
     state: { type: String, trim: true },

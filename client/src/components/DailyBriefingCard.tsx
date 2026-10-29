@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Play, Pause, Sparkles, Award, ChevronDown, ChevronUp, RefreshCw, Radio, PhoneCall, TrendingUp, CloudRain } from 'lucide-react';
+import { Volume2, Play, Pause, Sparkles, Award, ChevronDown, ChevronUp, RefreshCw, Radio, PhoneCall, TrendingUp, CloudRain, MapPin } from 'lucide-react';
 import { briefingApi } from '../services/api';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import toast from 'react-hot-toast';
@@ -59,7 +59,18 @@ export default function DailyBriefingCard({ farm: propFarm }: DailyBriefingCardP
 
   useEffect(() => {
     loadBriefing(activeStyle);
-  }, [farm?.crop, (farm as any)?.location?.city, farm?.city, (farm as any)?.location?.state, farm?.state, farm?.cropStage, farm?.farmName, activeStyle]);
+  }, [
+    farm?.crop,
+    (farm as any)?.location?.city,
+    farm?.city,
+    (farm as any)?.location?.state,
+    farm?.state,
+    farm?.latitude,
+    farm?.longitude,
+    farm?.cropStage,
+    farm?.farmName,
+    activeStyle
+  ]);
 
   // Handle Play/Stop of synthesized audio
   const handleToggleAudio = () => {
@@ -177,6 +188,12 @@ export default function DailyBriefingCard({ farm: propFarm }: DailyBriefingCardP
               {briefing?.farm?.crop && (
                 <span className="text-[11px] font-semibold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">
                   {briefing.farm.crop}
+                </span>
+              )}
+              {briefing?.farm?.location && (
+                <span className="text-[11px] font-medium px-2 py-0.5 bg-amber-100/80 text-amber-900 rounded-full flex items-center gap-1 border border-amber-200/80">
+                  <MapPin className="w-3 h-3 text-amber-700" />
+                  <span>{briefing.farm.location}</span>
                 </span>
               )}
             </div>

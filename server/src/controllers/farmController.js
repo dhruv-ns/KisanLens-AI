@@ -11,8 +11,8 @@ async function getFarm(req, res, next) {
     if (!isDBConnected()) {
       return res.json({ success: true, data: null });
     }
-    const query = req.userId ? { userId: req.userId } : {};
-    const farm = await Farm.findOne(query).maxTimeMS(5000).lean();
+    const query = req.userId ? { userId: req.userId } : { userId: null };
+    const farm = await Farm.findOne(query).sort({ updatedAt: -1 }).maxTimeMS(5000).lean();
     if (!farm) {
       return res.json({ success: true, data: null });
     }
@@ -31,10 +31,20 @@ async function createFarm(req, res, next) {
     if (!isDBConnected()) {
       return res.json({ success: true, data: req.body, _local: true });
     }
+    const city = req.body.city || req.body.location?.city || '';
+    const state = req.body.state || req.body.location?.state || '';
+    const district = req.body.district || req.body.location?.district || city;
+
     const farmData = {
       userId: req.userId || null,
       farmName: req.body.farmName || 'My Farm',
-      location: req.body.location || {},
+      city,
+      state,
+      location: {
+        city,
+        state,
+        district,
+      },
       latitude: req.body.latitude,
       longitude: req.body.longitude,
       area: req.body.area,
@@ -62,14 +72,32 @@ async function updateFarm(req, res, next) {
     if (!isDBConnected()) {
       return res.json({ success: true, data: req.body, _local: true });
     }
-    const farmId = req.body.farmId || req.params.id;
-    const query = farmId ? { _id: farmId } : (req.userId ? { userId: req.userId } : {});
+    const farmId = req.body._id || req.body.farmId || req.params.id;
+    const query = farmId
+      ? { _id: farmId }
+      : (req.userId ? { userId: req.userId } : { userId: null });
 
-    let farm = await Farm.findOne(query).maxTimeMS(5000);
+    let farm = await Farm.findOne(query).sort({ updatedAt: -1 }).maxTimeMS(5000);
+
+    const city = req.body.city || req.body.location?.city || farm?.city || farm?.location?.city || '';
+    const state = req.body.state || req.body.location?.state || farm?.state || farm?.location?.state || '';
+    const district = req.body.district || req.body.location?.district || city || farm?.location?.district || '';
+
+    const updates = {
+      ...req.body,
+      city,
+      state,
+      location: {
+        city,
+        state,
+        district,
+      },
+    };
+
     if (!farm) {
-      farm = new Farm({ userId: req.userId || null, ...req.body });
+      farm = new Farm({ userId: req.userId || null, ...updates });
     } else {
-      Object.assign(farm, req.body);
+      Object.assign(farm, updates);
     }
 
     await farm.save();
