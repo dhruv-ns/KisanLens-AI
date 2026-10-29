@@ -1,77 +1,90 @@
-# KisanLens AI 🌾🎙️
+# KisanLens AI 🌾🎙️👁️
 
-### Voice-First AI-Powered Farm Intelligence Platform (100% Powered by Gnani AI)
+### Multimodal Voice & Vision Farm Intelligence Platform
+**Powered by Gnani AI (Prisma STT • Timbre TTS • Evon LLM) & NVIDIA NIM (Nemotron 3.5 Super VL 120B)**
 
-> *See Your Farm. Understand Your Crop. Speak Your Questions. Make Better Decisions.*
-
-KisanLens AI is a **voice-first**, AI-powered agricultural decision-support platform designed for small and marginal farmers in India. It combines crop health diagnosis, weather intelligence, market data, and **Gnani AI's conversational intelligence (Prisma v2.5 STT, Timbre v2.5 TTS, and Evon v3.3 LLM)** to deliver actionable farming recommendations in the farmer's own language (Hindi, Hinglish, English, and regional Indian languages).
+> *See Your Farm. Inspect Your Crop. Speak Your Questions. Make Better Decisions.*
 
 ---
 
-## ✨ Features
+## 📖 Overview
 
-### 🔬 AI Crop Scanner (Powered by Gnani AI)
-Upload or capture crop images for instant AI-powered health analysis using Gnani AI (Evon v3.3) and ICAR-calibrated agronomic heuristics. Receive cautious preliminary assessments with confidence scores, severity levels, observations, and organic/IPM recommended actions.
+**KisanLens AI** is an advanced, voice-first and vision-powered agricultural decision-support platform engineered specifically for Indian farmers. It eliminates literacy and language barriers by marrying state-of-the-art **multimodal computer vision** (real leaf pathology inspection) with **conversational Indic voice AI** (speech-to-text, natural expressive text-to-speech, and agricultural reasoning) across 9+ Indian languages.
 
-### 🌦️ Weather Intelligence
-Real-time weather data from Open-Meteo API with agricultural context. Automated farm advisories for irrigation, spraying, and field work based on deterministic business rules.
+Whether a farmer snaps a photo of a diseased leaf while asking a spoken question, checks live Mandi prices, listens to a code-mixed daily farm briefing in Hinglish, dials an offline telephonic IVR helpline, or forecasts harvest yields, KisanLens AI delivers actionable, scientific, and organic agronomic advice in their native tongue.
 
-### 💰 Market / Mandi Intelligence
-Agricultural commodity prices with trend analysis. Supports live government data API (data.gov.in) with clearly labeled demo fallback data.
+---
 
-### 🧠 Farm Decision Engine
-Combines crop health + weather + market data to generate actionable daily farm recommendations. Uses deterministic rules for predictable decisions, AI for explanation only.
+## ✨ Flagship Capabilities
 
-### 🤖 AI Farming Assistant (Voice-First with Gnani AI)
-Conversational AI assistant supporting Hindi, English, and Hinglish powered by **Gnani AI Evon v3.3**. Uses farm context (crop, weather, analysis) for personalized responses. Features:
-- **Voice recording** with visual feedback and 60-second limit
-- **Transcription preview** banner showing what the farmer said via **Gnani Prisma v2.5**
-- **Audio response playback** synthesized via **Gnani Timbre v2.5**
-- **Auto-play mode** for hands-free conversation flow
+### 👁️ 1. True Multimodal Crop Vision Diagnostics (NVIDIA NIM Nemotron 3.5 Super VL 120B)
+- **Genuine Pixel Analysis**: Uploaded crop leaves are directly analyzed by NVIDIA NIM's **Nemotron 3.5 Super VL 120B** vision-language model. The AI inspects actual leaf discolorations, yellowing patterns, lesions, fungal growth, pest bites, and healthy tissue.
+- **No Scripted Responses**: Every diagnosis is custom-generated based on the visual evidence in the photo, outputting observations, identified issues, severity ratings, confidence levels, and organic IPM treatments.
+- **Multilingual Diagnostics**: Generates complete pathology reports in the farmer's selected native script (Hindi, Punjabi, Marathi, Gujarati, Tamil, Telugu, Kannada, Bengali, or English).
+- **Resilient Fallback Hierarchy**: `NVIDIA NIM Vision` ➔ `Gnani Evon LLM Reasoning` ➔ `ICAR Calibrated Agronomic Heuristics`.
 
-### 🎙️ Complete Gnani AI Stack Integration
-- **Prisma v2.5 STT** — Server-side speech-to-text supporting Indian languages + code-switching (Hinglish)
-- **Timbre v2.5 TTS** — Natural-sounding text-to-speech with expressive Indian voice profiles (e.g. Nalini, Yashvi)
-- **Evon v3.3 LLM** — Indic agricultural reasoning and crop disease diagnosis
-- **Browser Fallback** — Degrades gracefully to Web Speech API when network is unavailable
+### 🎙️ 2. Multimodal Voice Diagnostics
+- **Photo + Voice in One Shot**: Farmers can upload an image and simultaneously hold the mic button to record a question in their mother tongue (e.g., *"मेरी पत्ती पर यह भूरे धब्बे क्यों हैं?"*).
+- **Gnani Prisma v2.5 STT**: Transcribes raw speech with Indian dialect and accent tolerance.
+- **Combined Intelligence**: The transcribed audio question is merged with the visual diagnosis prompt so the AI directly answers the farmer's specific spoken concern.
+- **Instant Spoken Diagnosis**: Pre-synthesized using **Gnani Timbre v2.5 TTS** for seamless one-tap playback.
 
-### 🌐 Hindi + English (Bilingual)
-Full bilingual UI with proper translation architecture using locale files. Voice support for both Hindi and English.
+### 📻 3. Daily Code-Mixed Audio Briefings (*"Kisan Vani"*)
+- Personalized daily morning audio digest calibrated to the farmer's specific farm profile (crop, growth stage, soil, and district).
+- Combines live localized weather, spray/irrigation windows, and nearby Mandi commodity rates.
+- Delivered in natural **Hinglish**, **Hindi**, or **English** with expressive Indic voice synthesis.
 
-### 📊 Dashboard
-Central farmer dashboard answering: *"What should I know about my farm today?"*
+### ☎️ 4. Telephonic IVR Helpline Simulator (`1800-889-KISAN`)
+- Provides accessibility for farmers with basic feature phones or in low-connectivity areas without smartphones.
+- Realistic phone dialer with DTMF key tones and simulated telephone bandpass/noise cancellation.
+- Interactive audio menu:
+  - **Press 1**: Localized Weather Advisory
+  - **Press 2**: Live Mandi Rates
+  - **Press 3**: Crop Disease & Organic Remedies
+  - **Press 4**: Government Schemes (PM-KISAN, PMFBY, KCC)
+  - **Press 0**: Krishi Vigyan Kendra (KVK) Expert Assistance
 
-### 📋 Farm History
-Persistent crop analysis history with image previews and pagination.
+### 🤖 5. Conversational Indic AI Farming Assistant
+- Context-aware chatbot powered by **Gnani Evon v3.3**.
+- Complete voice-in, voice-out loop with audio waveform animations, transcription preview banners, and automatic speech playback.
+- Adheres to ICAR safety standards: never prescribes lethal/banned chemicals, prioritizing Integrated Pest Management (IPM), bio-control agents (*Trichoderma*, Neem oil), and soil health.
+
+### 📈 6. Machine Learning Crop Yield Predictor
+- Data-driven yield forecasting engine trained across 10 major Indian crops ($R^2 = 0.9734$).
+- Evaluates rainfall, temperature, soil composition, and acreage to predict output per hectare.
+
+### 🌦️ 7. Weather & Mandi Intelligence
+- Real-time weather and 7-day agro-climatic forecasts via Open-Meteo with automated farm action alerts.
+- Live commodity market rates via `data.gov.in` with historical trend charts.
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-                       KISANLENS AI (100% Gnani AI)
-                                    │
-                     ┌──────────────┴───────────────┐
-                     │                               │
-                React UI                       Express API
-              (Voice-First)                        │
-                     │               ┌──────────────┼───────────────┐
-                     │               │              │               │
-                     │               ▼              ▼               ▼
-                     │         Gnani AI        Open-Meteo       Mandi Data
-                     │      ┌────────┼────────┐     │               │
-                     │      │        │        │     │               │
-                     │    Prisma   Evon    Timbre   │               │
-                     │    (STT)    (LLM)   (TTS)    │               │
-                     │      │        │        │     │               │
-                     │      └────────┼────────┘     │               │
-                     │               │              │               │
-                     │               ▼              ▼               ▼
-                     │       FARM DECISION & DIAGNOSTIC ENGINE
-                     │                      │
-                     └──────────────────────┴───────────────────────┘
-                                            │
-                                         MongoDB
+                                      KISANLENS AI
+                                           │
+                    ┌──────────────────────┴──────────────────────┐
+                    │                                             │
+             React 19 Client                              Node.js Express API
+         (Vite + Tailwind CSS 4)                                  │
+                    │                      ┌──────────────────────┼──────────────────────┐
+                    │                      ▼                      ▼                      ▼
+                    │               Gnani AI Suite            NVIDIA NIM             Open-Meteo &
+                    │         ┌────────────┼───────────┐      Nemotron 3.5          data.gov.in
+                    │         │            │           │     Super VL 120B                │
+                    │       Prisma        Evon      Timbre         │                      │
+                    │       v2.5         v3.3       v2.5     (Vision Analysis)        (Weather /
+                    │       (STT)        (LLM)      (TTS)          │                    Mandi)
+                    │         │            │           │           │                      │
+                    │         └────────────┼───────────┘           │                      │
+                    │                      │                       │                      │
+                    │                      ▼                       ▼                      │
+                    │             MULTIMODAL DIAGNOSTIC & DECISION ENGINE ◄───────────────┘
+                    │                                      │
+                    └──────────────────────────────────────┼──────────────────────────────┘
+                                                           ▼
+                                                   MongoDB Database
 ```
 
 ---
@@ -79,245 +92,157 @@ Persistent crop analysis history with image previews and pagination.
 ## 🛠️ Tech Stack
 
 ### Frontend
-- React 19 + TypeScript
-- Vite 8
-- Tailwind CSS 4
-- React Router
-- Recharts
-- Lucide React
-- React Hot Toast
-- Axios
+- **Framework**: React 19, TypeScript, Vite 8
+- **Styling**: Tailwind CSS 4, Custom Indic Typography & Glassmorphism
+- **Routing & State**: React Router v7, React Context (Language & Farm Profiles)
+- **Audio & Media**: HTML5 MediaRecorder API, Web Audio API, Browser Speech Synthesis Fallback
+- **Icons & Visuals**: Lucide React, Recharts (Mandi Trends), React Hot Toast
 
 ### Backend
-- Node.js + Express
-- MongoDB + Mongoose
-- **Gnani AI Prisma v2.5** (Speech-to-Text)
-- **Gnani AI Timbre v2.5** (Text-to-Speech)
-- **Gnani AI Evon v3.3** (Agricultural LLM & Crop Diagnostics)
-- Open-Meteo Weather API
-- JWT Authentication
-- Multer (image + audio uploads)
-- Helmet, CORS, Rate Limiting
-- Winston (structured logging)
+- **Runtime**: Node.js, Express.js
+- **Database**: MongoDB with Mongoose ODM
+- **Vision AI**: NVIDIA NIM (`nvidia/nemotron-3.5-super-vl-120b-a12b`)
+- **Speech AI**: Gnani AI Prisma v2.5 STT, Gnani AI Timbre v2.5 TTS
+- **Reasoning AI**: Gnani AI Evon v3.3 Agricultural LLM
+- **External APIs**: Open-Meteo, data.gov.in, ImageKit CDN
+- **Security & Logging**: Helmet, CORS, Express Rate Limit, Winston Logger, JWT Auth
 
 ---
 
-## 📁 Project Structure
+## 📁 Repository Structure
 
 ```
 kisanlens-ai/
-├── client/                    # React Frontend (Voice-First)
+├── client/                           # React 19 Frontend
 │   ├── src/
-│   │   ├── components/        # Reusable UI components
-│   │   ├── contexts/          # React contexts (Language, Farm)
-│   │   ├── hooks/             # Custom hooks
-│   │   │   ├── useVoiceRecorder.ts   # MediaRecorder audio capture
-│   │   │   └── useAudioPlayer.ts     # Audio playback + browser TTS
-│   │   ├── layouts/           # App layout
-│   │   ├── locales/           # en.json, hi.json translations
-│   │   ├── pages/             # Route pages (voice-first Assistant)
-│   │   ├── services/          # API service layer (+ voice API)
-│   │   ├── App.tsx            # Router configuration
-│   │   ├── main.tsx           # Entry point
-│   │   └── index.css          # Global styles + voice animations
-│   ├── public/
-│   ├── index.html
+│   │   ├── components/               # Loading skeletons, Briefing cards, Navbars
+│   │   ├── contexts/                 # LanguageContext (hi/en), FarmContext
+│   │   ├── hooks/
+│   │   │   ├── useVoiceRecorder.ts   # MediaRecorder voice input handler
+│   │   │   └── useAudioPlayer.ts     # Dual-engine audio player with lifecycle guards
+│   │   ├── locales/                  # en.json, hi.json translation dictionaries
+│   │   ├── pages/
+│   │   │   ├── Assistant.tsx         # Voice-first Indic AI agricultural chatbot
+│   │   │   ├── CropScanner.tsx       # Multimodal leaf photo + voice recording input
+│   │   │   ├── CropAnalysisResult.tsx# Diagnostic report with audio playback
+│   │   │   ├── IvrHelpline.tsx       # Interactive 1800-889-KISAN phone simulator
+│   │   │   ├── YieldPredictor.tsx    # ML crop yield calculation interface
+│   │   │   ├── Weather.tsx           # Agricultural weather & spraying advisories
+│   │   │   └── MarketPrices.tsx      # Mandi rates with commodity trend analysis
+│   │   └── services/api.ts           # Centralized Axios client & API endpoints
 │   └── vite.config.ts
-├── server/                    # Express Backend
+├── server/                           # Express Backend
 │   ├── src/
-│   │   ├── config/            # Environment + database config
-│   │   ├── controllers/       # Route handlers
-│   │   │   ├── voiceController.js    # Voice pipeline controller (Gnani AI)
-│   │   │   ├── cropController.js     # Crop diagnosis controller (Gnani AI)
-│   │   │   ├── assistantController.js# Assistant controller (Gnani AI)
-│   │   │   └── ...                   # Other controllers
-│   │   ├── middleware/        # Auth, upload, error handling
-│   │   ├── models/            # Mongoose schemas
-│   │   ├── routes/            # Express routes
-│   │   │   ├── voiceRoutes.js        # Voice API routes
-│   │   │   └── ...                   # Other routes
-│   │   ├── services/          # Business logic
-│   │   │   ├── gnaniService.js       # Gnani AI (STT + TTS + LLM + Diagnosis)
-│   │   │   └── ...                   # Other services
-│   │   ├── utils/             # Logger
-│   │   └── index.js           # Server entry point
+│   │   ├── config/                   # Config loader & database connection
+│   │   ├── controllers/
+│   │   │   ├── cropController.js     # Multimodal image & voice crop diagnostics
+│   │   │   ├── voiceController.js    # Gnani Prisma STT & Timbre TTS routing
+│   │   │   ├── briefingController.js # Personalized daily code-mixed audio briefing
+│   │   │   ├── ivrController.js      # Telephonic IVR menu handler
+│   │   │   ├── yieldController.js    # ML crop yield estimation
+│   │   │   └── weatherController.js  # Weather advisory with offline fallbacks
+│   │   ├── services/
+│   │   │   ├── gnaniService.js       # Gnani AI integration + NVIDIA NIM Vision engine
+│   │   │   ├── cropKnowledgeBase.js  # Calibrated 9-language ICAR diagnostic fallback
+│   │   │   ├── weatherService.js     # Open-Meteo weather client
+│   │   │   └── marketService.js      # Mandi rate client with agro-climatic fallbacks
+│   │   ├── models/                   # CropAnalysis, Farm, User Mongoose schemas
+│   │   └── index.js                  # Express server bootstrap
 │   └── .env.example
-├── docs/
-├── .env.example
-├── .gitignore
-└── README.md
+├── README.md
+└── package.json
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- MongoDB (local or Atlas)
-- Gnani AI API key (`GNANI_API_KEY`)
+- Node.js 18 or higher
+- MongoDB instance (local or Atlas)
+- Gnani AI API Key ([Vachana API Portal](https://api.vachana.ai))
+- NVIDIA NIM API Key ([NVIDIA Build](https://build.nvidia.com/nvidia/nemotron-3.5-super-vl-120b-a12b))
 
-### 1. Clone & Setup
-
+### 1. Clone the Repository
 ```bash
-git clone <repo-url>
-cd kisanlens-ai
+git clone https://github.com/dhruv-ns/KisanLens-AI.git
+cd KisanLens-AI
 ```
 
 ### 2. Backend Setup
-
 ```bash
 cd server
 npm install
 cp .env.example .env
-# Edit .env with your Gnani AI API key
+```
+
+Configure your `.env` file:
+```properties
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/kisanlens
+
+# Gnani AI Stack (STT: Prisma v2.5, TTS: Timbre v2.5, LLM: Evon v3.3)
+GNANI_API_KEY=your_gnani_api_key_here
+GNANI_EVON_ENDPOINT=https://api.vachana.ai/v1/chat/completions
+GNANI_EVON_ENABLED=true
+
+# NVIDIA NIM — Vision-Language Model for Crop Disease Diagnosis
+NVIDIA_API_KEY=nvapi-your_nvidia_api_key_here
+NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
+NVIDIA_VISION_MODEL=nvidia/nemotron-3.5-super-vl-120b-a12b
+
+# Security Secrets
+JWT_SECRET=your_secure_jwt_secret
+JWT_REFRESH_SECRET=your_secure_jwt_refresh_secret
+CLIENT_URL=http://localhost:5173
+```
+
+Start the backend:
+```bash
 npm run dev
 ```
 
 ### 3. Frontend Setup
-
 ```bash
-cd client
+cd ../client
 npm install
 npm run dev
 ```
 
-### 4. Open in Browser
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000/api/health
+Visit **`http://localhost:5173`** in your browser.
 
 ---
 
-## 🔑 Environment Variables
+## 📡 API Reference
 
-### Server (.env)
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `PORT` | Server port | No (default: 5000) |
-| `MONGODB_URI` | MongoDB connection string | Yes |
-| `GNANI_API_KEY` | Gnani AI API key (STT + TTS + LLM) | Yes (for AI features) |
-| `GNANI_EVON_ENDPOINT` | Evon v3.3 LLM endpoint | No (default: https://api.vachana.ai/v1/chat/completions) |
-| `GNANI_EVON_ENABLED` | Enable Evon LLM (`true`/`false`) | No (default: `true`) |
-| `JWT_SECRET` | JWT signing secret (32+ chars) | Yes |
-| `JWT_REFRESH_SECRET` | JWT refresh secret | Yes |
-| `CLIENT_URL` | Frontend URL for CORS | Yes |
-| `MARKET_API_KEY` | data.gov.in API key | No (uses demo data) |
-
-### Client (.env)
-
-| Variable | Description |
-|----------|-------------|
-| `VITE_API_URL` | Backend API URL (empty for proxy in dev) |
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/crops/analyze` | `POST` | Upload crop leaf image + optional farmer audio note for vision diagnosis |
+| `/api/crops/history` | `GET` | Retrieve paginated diagnostic history for the farm |
+| `/api/voice/transcribe` | `POST` | Transcribe speech audio using Gnani Prisma v2.5 |
+| `/api/voice/synthesize` | `POST` | Synthesize Indic regional speech using Gnani Timbre v2.5 |
+| `/api/voice/chat` | `POST` | End-to-end conversational voice loop (Audio In ➔ AI ➔ Audio Out) |
+| `/api/briefing/today` | `GET` | Get personalized code-mixed daily farm audio briefing |
+| `/api/ivr/call` | `POST` | Process IVR keypad simulation & return audio responses |
+| `/api/yield/predict` | `POST` | Predict harvest yield per hectare based on agro-parameters |
+| `/api/weather/current` | `GET` | Get localized weather advisory and field condition alerts |
+| `/api/market` | `GET` | Query state/district Mandi commodity rates and price trends |
 
 ---
 
-## 📡 API Documentation
+## 🛡️ Agronomic Safety & Responsible AI
 
-### Health
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check |
-
-### Voice (Gnani AI)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/voice/transcribe` | Upload audio → get transcript (Prisma v2.5 STT) |
-| POST | `/api/voice/synthesize` | Send text → get audio (Timbre v2.5 TTS) |
-| POST | `/api/voice/chat` | Full pipeline: audio/text → AI response + audio |
-| GET | `/api/voice/status` | Voice service availability & supported languages |
-
-### AI Assistant (Gnani Evon v3.3)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/assistant/message` | Send message to Gnani AI |
-| DELETE | `/api/assistant/history` | Clear conversation |
-
-### Crop Analysis (Gnani AI)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/crops/analyze` | Upload & diagnose crop issue (multipart) |
-| GET | `/api/crops/history` | Get analysis history (paginated) |
-| GET | `/api/crops/:id` | Get specific analysis |
-
-### Weather
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/weather/current?lat=&lon=` | Current weather + advisory |
-| GET | `/api/weather/forecast?lat=&lon=` | Forecast data |
-| GET | `/api/weather/location?q=` | Geocode search |
-
-### Market
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/market?commodity=&state=` | Market data |
-| GET | `/api/market/trend?commodity=` | Price trend |
-| GET | `/api/market/options` | Available commodities/states |
-
-### Farm
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/farm` | Get farm profile |
-| POST | `/api/farm` | Create farm profile |
-| PUT | `/api/farm` | Update farm profile |
-| POST | `/api/farm/advice` | Get farm action recommendations |
-
----
-
-## 🧪 Demo Workflow (Voice Demo)
-
-1. **Open KisanLens** → Landing page
-2. **Navigate to AI Assistant** → Voice-first interface
-3. **Tap the green mic button** → Recording starts with visual pulse
-4. **Speak in Hindi** → "मेरी टमाटर की फसल में पत्ते पीले हो रहे हैं"
-5. **See transcription preview** → Green banner shows what you said (Gnani Prisma v2.5)
-6. **AI responds in Hindi** → Text appears (Gnani Evon v3.3) + audio auto-plays (Gnani Timbre v2.5)
-7. **Tap 'सुनें' on any message** → Replay the AI response audio
-8. **Check Weather** → Live weather + farm advisory
-9. **Scan Crop** → Upload crop image for Gnani AI diagnostic assessment
-10. **View Market** → Commodity prices with trend chart
-11. **Toggle language** → Switch between Hindi ↔ English UI
-
----
-
-## 🔒 Security
-
-- Helmet security headers
-- CORS configuration
-- Rate limiting (100/15min general, 20/15min AI endpoints)
-- File upload validation (type, size, MIME)
-- Safe filename generation (UUID)
-- JWT access + refresh tokens
-- bcrypt password hashing
-- No secrets in frontend code
-- Centralized error handling
-
----
-
-## 🚢 Deployment
-
-### Frontend → Vercel
-```bash
-cd client
-npm run build
-# Deploy dist/ to Vercel
-```
-
-### Backend → Render
-```bash
-cd server
-# Set environment variables:
-# GNANI_API_KEY=your_key
-# GNANI_EVON_ENABLED=true
-# Start command: npm start
-```
+1. **ICAR & KVK Advisory Standards**: KisanLens AI strictly adheres to safety standards set by the Indian Council of Agricultural Research. It never suggests toxic, banned, or hazardous pesticide dosages.
+2. **Organic First (IPM)**: Recommendations prioritize bio-control agents (*Trichoderma viride*, *Pseudomonas fluorescens*), neem formulations (1500 ppm), cultural practices, and balanced NPK fertilizer usage.
+3. **Escalation Protocol**: Unclear or severe infestations automatically prompt the farmer to consult their local Krishi Vigyan Kendra (KVK) or Block Agriculture Officer.
 
 ---
 
 ## 📄 License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-**Built with ❤️ for Indian farmers using Gnani AI**
+**Built with pride for Indian Farmers across Bharat.** 🇮🇳
