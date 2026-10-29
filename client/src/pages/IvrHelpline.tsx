@@ -574,7 +574,7 @@ export default function IvrHelpline() {
       </div>
 
       {/* Noise Canceller Architecture Details */}
-      <div className="bg-white rounded-3xl border border-[var(--color-border)] p-6 shadow-sm space-y-4">
+      {/* <div className="bg-white rounded-3xl border border-[var(--color-border)] p-6 shadow-sm space-y-4">
         <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-amber-500" />
           <span>How KisanLens IVR Targets the Noise Canceller Award</span>
@@ -611,7 +611,7 @@ export default function IvrHelpline() {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
