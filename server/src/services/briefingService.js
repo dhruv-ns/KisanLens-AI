@@ -6,12 +6,14 @@
  * synthesizing localized live weather forecasts and Mandi market prices via Gnani Timbre v2.5.
  */
 
+const axios = require('axios');
+const config = require('../config');
 const { synthesizeSpeech, isGnaniConfigured } = require('./gnaniService');
 const { getWeather, searchLocation } = require('./weatherService');
-const { getMarketData, getTrend } = require('./marketService');
+const { getMarketData, getMarketTrend } = require('./marketService');
 const logger = require('../utils/logger');
 
-// Crop specific agronomic tips
+// Crop specific agronomic tips for varied contexts
 const CROP_ADVICE_TIPS = {
   tomato: 'Tomato vines ko staking dekar leaves ko soil se upar rakhein, taaki fungal early blight ka risk kam rahe. Early morning mein NSKE neem spray preventive measure ke taur par use karein.',
   wheat: 'Wheat crop mein light irrigation maintain karein, standing water bilkul na hone dein. Yellow rust ki scouting ke liye morning mein foliage inspect karein.',
@@ -26,109 +28,316 @@ const CROP_ADVICE_TIPS = {
 };
 
 /**
+ * Generate dynamic AI briefing broadcast using NVIDIA NIM or Gnani Evon
+ */
+async function generateAIBriefingText(briefingContext, languageStyle = 'hinglish') {
+  const {
+    crop,
+    farmName,
+    locationName,
+    temp,
+    maxTemp,
+    minTemp,
+    humidity,
+    rainProb,
+    weatherCondition,
+    windSpeed,
+    modalPrice,
+    marketName,
+    trendDirection,
+    trendChange,
+    todayDateStr,
+    timeGreeting,
+    cropStage,
+  } = briefingContext;
+
+  const styleInstruction = languageStyle === 'hindi'
+    ? 'भाषा: शुद्ध, सरल और प्राकृतिक हिन्दी (Devanagari script only). Use standard respectful Indian farmer terminology (नमस्ते किसान साथी, आज का मौसम, मंडी भाव, कृषि सलाह).'
+    : languageStyle === 'english'
+    ? 'Language: Simple, warm, professional English tailored to Indian farmers. Speak clearly about today\'s conditions and practical farming steps.'
+    : 'Language: Natural, conversational code-mixed Hinglish (Hindi + English written in Roman script, like "Namaste Kisan bhai! Aaj aapke Indore mein..."). Keep it warm and engaging like a live morning radio bulletin.';
+
+  const prompt = `You are an expert, warm, and engaging agricultural radio broadcaster on KisanLens AI ("Kisan Vani").
+Generate a LIVE daily farm audio briefing broadcast for a farmer today.
+
+LIVE CONTEXT:
+- Date: ${todayDateStr}
+- Time of Day: ${timeGreeting}
+- Farm Name: ${farmName}
+- Location: ${locationName}
+- Crop: ${crop} (Growth Stage: ${cropStage})
+- Live Weather: ${temp}°C (Today's Range: ${minTemp}°C - ${maxTemp}°C), Humidity: ${humidity}%, Rain Chance: ${rainProb}%, Sky: ${weatherCondition}, Wind: ${windSpeed} km/h
+- Live Mandi Price: ₹${modalPrice.toLocaleString('en-IN')}/quintal at ${marketName} (Price trend: ${trendDirection}, ${trendChange > 0 ? `+${trendChange}%` : `${trendChange}%`})
+
+MANDATORY INSTRUCTIONS:
+1. ${styleInstruction}
+2. Be CONCISE (around 80-110 words maximum). Every word must be relevant for a farmer listening while working in the field.
+3. Structure:
+   - Warm greeting mentioning today's date & location
+   - Today's live weather summary & what it means for field work (irrigation/spraying)
+   - Real-time Mandi market price & trend for ${crop}
+   - One actionable agronomic tip tailored for ${crop} under today's weather
+   - Encouraging sign-off
+4. DO NOT use generic placeholders or bullet points. Output ONLY the spoken broadcast script ready for text-to-speech.`;
+
+  // 1. Try NVIDIA NIM (Nemotron 3.5 Super VL)
+  if (config.nvidia?.apiKey && config.nvidia.apiKey.length > 5) {
+    try {
+      const nvidiaUrl = config.nvidia.baseUrl || 'https://integrate.api.nvidia.com/v1';
+      const nvidiaModel = config.nvidia.visionModel || 'nvidia/nemotron-3.5-super-vl-120b-a12b';
+
+      const response = await axios.post(
+        `${nvidiaUrl}/chat/completions`,
+        {
+          model: nvidiaModel,
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 350,
+          temperature: 0.6,
+          chat_template_kwargs: { enable_thinking: false },
+          stream: false,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${config.nvidia.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 18000,
+        }
+      );
+
+      let text = response.data?.choices?.[0]?.message?.content;
+      if (!text) {
+        text = response.data?.choices?.[0]?.message?.reasoning_content;
+      }
+      if (text && text.trim().length > 40) {
+        logger.info(`[Daily Briefing] Dynamic broadcast generated via NVIDIA NIM (${text.trim().length} chars)`);
+        return text.trim();
+      }
+    } catch (err) {
+      logger.warn(`[Daily Briefing] NVIDIA NIM broadcast generation failed: ${err.message}. Trying Gnani Evon...`);
+    }
+  }
+
+  // 2. Try Gnani Evon LLM
+  if (isGnaniConfigured() && config.gnani.evonEnabled) {
+    try {
+      const evonUrl = config.gnani.evonEndpoint || 'https://api.vachana.ai/v1/chat/completions';
+      const response = await axios.post(
+        evonUrl,
+        {
+          model: 'gnani-evon-v3.3',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 350,
+        },
+        {
+          headers: {
+            'X-API-Key-ID': config.gnani.apiKey,
+            'Content-Type': 'application/json',
+          },
+          timeout: 15000,
+        }
+      );
+
+      const text = response.data?.choices?.[0]?.message?.content;
+      if (text && text.trim().length > 40) {
+        logger.info(`[Daily Briefing] Dynamic broadcast generated via Gnani Evon (${text.trim().length} chars)`);
+        return text.trim();
+      }
+    } catch (err) {
+      logger.warn(`[Daily Briefing] Gnani Evon broadcast generation failed: ${err.message}.`);
+    }
+  }
+
+  // 3. Dynamic Agronomic Heuristic Fallback (Never static)
+  return buildDynamicFallbackBroadcast(briefingContext, languageStyle);
+}
+
+/**
+ * Dynamic fallback broadcast that incorporates all live numbers seamlessly
+ */
+function buildDynamicFallbackBroadcast(ctx, style) {
+  const {
+    crop,
+    locationName,
+    temp,
+    rainProb,
+    modalPrice,
+    marketName,
+    trendDirection,
+    todayDateStr,
+    cropKey,
+  } = ctx;
+
+  const cropAdvice = CROP_ADVICE_TIPS[cropKey] || CROP_ADVICE_TIPS.default;
+  const isRain = rainProb > 30;
+
+  if (style === 'hindi') {
+    return `नमस्ते किसान साथी! आज ${todayDateStr} के दैनिक कृषि बुलेटिन में आपका स्वागत है। आपके क्षेत्र ${locationName} में वर्तमान तापमान लगभग ${temp}°C है और बारिश की संभावना ${rainProb}% है। ${
+      isRain
+        ? 'आज बारिश की संभावना को देखते हुए सिंचाई और कीटनाशक छिड़काव 24 घंटे के लिए स्थगित रखें।'
+        : 'मौसम अनुकूल है, आप सामान्य सिंचाई और निराई-गुड़ाई कर सकते हैं।'
+    } मंडी भाव: ${marketName} में आज ${crop} का औसत मॉडल भाव लगभग ₹${modalPrice.toLocaleString('en-IN')} प्रति क्विंटल दर्ज किया गया है। आज का कृषि सुझाव: फसलों में जलभराव न होने दें तथा कीट नियंत्रण हेतु नीम आधारित जैविक कीटनाशक का प्रयोग करें। आपका दिन लाभकारी और सफल हो!`;
+  }
+
+  if (style === 'english') {
+    return `Hello and welcome to your daily KisanLens farm broadcast for ${todayDateStr}. Local weather in ${locationName} is ${temp}°C with a ${rainProb}% chance of rain. ${
+      isRain
+        ? 'Rain is likely; hold off on foliar sprays and irrigation for the next 24 hours.'
+        : 'Clear skies prevail; an excellent day for farm field operations and balanced irrigation.'
+    } Mandi update: In ${marketName}, ${crop} is trading at a modal price of ₹${modalPrice.toLocaleString('en-IN')} per quintal with a ${trendDirection} trend. Today's agronomic advisory: Practice regular pest scouting and maintain proper soil drainage. Have a safe and profitable farming day!`;
+  }
+
+  // Default: Code-Mixed Hinglish
+  return `Namaste Kisan bhai! Aaj ${todayDateStr} ka live KisanLens Daily Audio Briefing aapke liye. Sabse pehle local weather: Aaj ${locationName} mein temperature lagbhag ${temp} degree Celsius hai, aur rain probability ${rainProb}% hai. ${
+    isRain
+      ? 'Rain ke chances hain, isliye chemical spray aur excessive watering ko 24 hours ke liye postpone karein.'
+      : 'Weather stable hai, irrigation aur weeding activities aaram se execute kar sakte hain.'
+  } Ab aate hain live Mandi rates par: ${marketName} mein aaj ${crop} ka modal price ₹${modalPrice.toLocaleString('en-IN')} per quintal chal raha hai with a ${trendDirection} trend. Aur aaj ki expert agronomic advice: ${cropAdvice} KisanLens AI ke sath connected rahein, have a great and productive day!`;
+}
+
+/**
  * Generate a personalized daily audio briefing for a farmer
- *
- * @param {Object} farm
- * @param {string} [farm.crop]
- * @param {string} [farm.farmName]
- * @param {string} [farm.city]
- * @param {string} [farm.state]
- * @param {number} [farm.latitude]
- * @param {number} [farm.longitude]
- * @param {number} [farm.area]
- * @param {string} [farm.cropStage]
- * @param {string} [languageStyle] 'hinglish' | 'hindi' | 'english'
  */
 async function generateDailyBriefing(farm = {}, languageStyle = 'hinglish') {
-  const crop = farm.crop || 'Tomato';
+  const crop = farm.crop || 'Wheat';
   const farmName = farm.farmName || 'My Farm';
-  const locationName = farm.city || farm.state || 'Local Farm';
-  const lat = farm.latitude || 28.6139;
-  const lon = farm.longitude || 77.2090;
-  const cropStage = farm.cropStage || 'Vegetative / Growth';
+  let locationName = farm.city || farm.location?.city || farm.state || farm.location?.state || 'Karnal';
+  let state = farm.state || farm.location?.state || 'Haryana';
+  let lat = farm.latitude ? parseFloat(farm.latitude) : null;
+  let lon = farm.longitude ? parseFloat(farm.longitude) : null;
+  const cropStage = farm.cropStage || 'Vegetative Growth';
 
-  // 1. Fetch Local Weather
-  let temp = 30;
-  let rainProb = 5;
+  // If coordinates are missing, resolve them via geocoding
+  if (!lat || !lon) {
+    try {
+      const geoResults = await searchLocation(locationName);
+      if (geoResults && geoResults.length > 0) {
+        lat = geoResults[0].latitude;
+        lon = geoResults[0].longitude;
+        locationName = geoResults[0].name || locationName;
+        state = geoResults[0].state || state;
+      }
+    } catch (geoErr) {
+      logger.warn('[Daily Briefing] Geocoding fallback:', geoErr.message);
+    }
+  }
+
+  lat = lat || 28.6139;
+  lon = lon || 77.2090;
+
+  // 1. Fetch Real Live Weather
+  let temp = 28;
+  let maxTemp = 32;
+  let minTemp = 18;
+  let humidity = 55;
+  let rainProb = 10;
+  let windSpeed = 8;
   let weatherCondition = 'Clear / Sunny';
-  let rainNoticeHinglish = 'Rain ki probability negligible hai, isliye irrigation schedule smoothly continue kar sakte hain';
-  let rainNoticeHindi = 'बारिश की संभावना नहीं है, इसलिए आप सामान्य सिंचाई जारी रख सकते हैं';
 
   try {
     const weatherData = await getWeather(lat, lon);
     if (weatherData?.current) {
-      temp = Math.round(weatherData.current.temperature ?? weatherData.current.temperature_2m ?? 30);
-      rainProb = weatherData.daily?.precipitation_probability_max?.[0] || 5;
-      const precip = weatherData.current.precipitation || 0;
-      if (rainProb > 40 || precip > 2) {
-        weatherCondition = 'Rainy / Overcast';
-        rainNoticeHinglish = `Aaj rain probability lagbhag ${rainProb}% hai, isliye foliar spray aur excess irrigation ko 24 hours ke liye postpone karein`;
-        rainNoticeHindi = `आज बारिश की संभावना लगभग ${rainProb} प्रतिशत है, इसलिए कीटनाशक छिड़काव और सिंचाई 24 घंटे के लिए टाल दें`;
-      } else {
-        rainNoticeHinglish = `Weather mostly clear rahega with only ${rainProb}% rain chance, isliye aaj irrigation aur farm activities ke liye ideal day hai`;
-        rainNoticeHindi = `मौसम मुख्य रूप से साफ रहेगा और बारिश की संभावना केवल ${rainProb} प्रतिशत है, अतः आज खेत के कार्यों के लिए उपयुक्त दिन है`;
+      temp = Math.round(weatherData.current.temperature ?? weatherData.current.temperature_2m ?? 28);
+      humidity = Math.round(weatherData.current.humidity ?? 55);
+      windSpeed = Math.round(weatherData.current.windSpeed ?? 8);
+      weatherCondition = weatherData.current.weatherDescription || 'Mainly Clear';
+
+      if (weatherData.daily) {
+        maxTemp = Math.round(weatherData.daily.temperatureMax?.[0] ?? weatherData.daily.temperature_2m_max?.[0] ?? temp + 3);
+        minTemp = Math.round(weatherData.daily.temperatureMin?.[0] ?? weatherData.daily.temperature_2m_min?.[0] ?? temp - 8);
+        rainProb = Math.round(
+          weatherData.daily.precipitationProbabilityMax?.[0] ??
+          weatherData.daily.precipitation_probability_max?.[0] ??
+          (weatherData.current.precipitation > 0 ? 60 : 10)
+        );
       }
     }
   } catch (err) {
     logger.warn('[Daily Briefing] Weather fetch fallback:', err.message);
   }
 
-  // 2. Fetch Mandi Market Price
-  let modalPrice = 2450;
+  // 2. Fetch Real Mandi Market Price
+  let modalPrice = 2400;
+  let marketName = `${locationName} Mandi`;
   let trendDirection = 'stable';
+  let trendChange = 0;
+  let minPrice = modalPrice - 150;
+  let maxPrice = modalPrice + 200;
+
   try {
-    const marketTrend = await getTrend(crop);
-    if (marketTrend?.currentPrice) {
-      modalPrice = marketTrend.currentPrice;
-      trendDirection = marketTrend.trend || 'stable';
-    } else {
-      const data = await getMarketData(crop, farm.state || 'Madhya Pradesh', farm.city || 'Bhopal');
-      if (data?.[0]?.modalPrice) {
-        modalPrice = data[0].modalPrice;
+    const marketResult = await getMarketData(crop, state, farm.city || farm.location?.city);
+    if (marketResult?.data && marketResult.data.length > 0) {
+      const trend = getMarketTrend(marketResult.data);
+      if (trend?.latestPrice) {
+        modalPrice = trend.latestPrice;
+        trendDirection = trend.trend || 'stable';
+        trendChange = trend.changePercent || 0;
+        minPrice = trend.minPrice || (modalPrice - 150);
+        maxPrice = trend.maxPrice || (modalPrice + 200);
+      }
+      if (marketResult.data[0]?.market) {
+        marketName = marketResult.data[0].market;
       }
     }
   } catch (err) {
     logger.warn('[Daily Briefing] Market fetch fallback:', err.message);
   }
 
-  // 3. Agronomic Advice for Crop
+  // 3. Agronomic context
   const normCrop = crop.toLowerCase();
   const cropKey = Object.keys(CROP_ADVICE_TIPS).find(k => normCrop.includes(k)) || 'default';
-  const adviceHinglish = CROP_ADVICE_TIPS[cropKey];
 
-  // 4. Formulate Code-Mixed Hinglish Bulletin (Mixed Vibes Award)
-  const todayDateStr = new Date().toLocaleDateString('en-IN', {
+  const today = new Date();
+  const hour = today.getHours();
+  const timeGreeting = hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening';
+  const todayDateStr = today.toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
 
-  const hinglishText = `Namaste Kisan bhai! Yeh hai aapka personalized KisanLens Daily Audio Briefing, aaj ${todayDateStr} ke liye aapke ${farmName} profile par. Sabse pehle local weather update: Aaj ${locationName} mein temperature lagbhag ${temp} degree Celsius rahega. ${rainNoticeHinglish}. Ab chalte hain Mandi Market Prices par: Aaj aapke ${crop} crop ka modal market price lagbhag ₹${modalPrice.toLocaleString('en-IN')} per quintal record kiya gaya hai, with a ${trendDirection} trend. Aur aaj ki expert agronomic advice: ${adviceHinglish}. Regular crop health monitor karte rahein aur kisi bhi leaf spot ke liye KisanLens scanner use karein. KisanLens AI ke sath connected rahein, have a profitable and safe farming day!`;
+  const briefingContext = {
+    crop,
+    farmName,
+    locationName,
+    state,
+    temp,
+    maxTemp,
+    minTemp,
+    humidity,
+    rainProb,
+    weatherCondition,
+    windSpeed,
+    modalPrice,
+    marketName,
+    trendDirection,
+    trendChange,
+    todayDateStr,
+    timeGreeting,
+    cropStage,
+    cropKey,
+  };
 
-  const hindiText = `नमस्ते किसान भाई! यह है आपका व्यक्तिगत किसानलेंस दैनिक कृषि बुलेटिन, आज ${todayDateStr} के लिए। आपके क्षेत्र ${locationName} में आज का तापमान लगभग ${temp} डिग्री सेल्सियस रहेगा। ${rainNoticeHindi}। मंडी भाव अपडेट: आज ${crop} का औसत मॉडल भाव लगभग ₹${modalPrice.toLocaleString('en-IN')} रुपये प्रति क्विंटल चल रहा है। आज की विशेषज्ञ कृषि सलाह: फसलों में जलभराव न होने दें तथा रोग से बचाव हेतु नीम तेल का छिड़काव करें। किसानलेंस एआई के साथ जुड़े रहें, आपका दिन शुभ और लाभकारी हो!`;
+  // 4. Dynamically generate the broadcast text for the requested language
+  const chosenSpokenText = await generateAIBriefingText(briefingContext, languageStyle);
 
-  const englishText = `Hello Farmer friend! This is your personalized KisanLens Daily Audio Briefing for ${todayDateStr}. Local weather for ${locationName}: Expected temperature is ${temp}°C. ${rainProb > 40 ? 'Rain is expected; postpone spraying.' : 'Clear skies expected; suitable for field activities.'} Mandi market update: Modal price for ${crop} is ₹${modalPrice.toLocaleString('en-IN')} per quintal with a ${trendDirection} trend. Agronomic recommendation: Practice integrated pest management and scout your crops daily. Have a productive farming day with KisanLens AI!`;
-
-  // Select primary spoken text based on languageStyle
-  let chosenSpokenText = hinglishText;
-  let ttsLang = 'hi-IN'; // Gnani Timbre Hindi model produces authentic, natural Hinglish cadence
-
-  if (languageStyle === 'hindi') {
-    chosenSpokenText = hindiText;
-    ttsLang = 'hi-IN';
-  } else if (languageStyle === 'english') {
-    chosenSpokenText = englishText;
-    ttsLang = 'en-IN';
-  }
+  // Generate the other styles dynamically for the tabs
+  const [hinglishText, hindiText, englishText] = await Promise.all([
+    languageStyle === 'hinglish' ? Promise.resolve(chosenSpokenText) : Promise.resolve(buildDynamicFallbackBroadcast(briefingContext, 'hinglish')),
+    languageStyle === 'hindi' ? Promise.resolve(chosenSpokenText) : Promise.resolve(buildDynamicFallbackBroadcast(briefingContext, 'hindi')),
+    languageStyle === 'english' ? Promise.resolve(chosenSpokenText) : Promise.resolve(buildDynamicFallbackBroadcast(briefingContext, 'english')),
+  ]);
 
   // 5. Synthesize Audio via Gnani Timbre TTS
   let audioBase64 = null;
   let audioContentType = 'audio/wav';
+  const ttsLang = languageStyle === 'english' ? 'en-IN' : 'hi-IN';
 
   if (isGnaniConfigured()) {
     try {
-      logger.info(`[Daily Briefing] Synthesizing audio via Gnani Timbre (${chosenSpokenText.length} chars, style=${languageStyle})`);
-      const synthRes = await synthesizeSpeech(chosenSpokenText, ttsLang);
+      logger.info(`[Daily Briefing] Synthesizing dynamic audio via Gnani Timbre (${chosenSpokenText.length} chars, style=${languageStyle})`);
+      const synthRes = await synthesizeSpeech(chosenSpokenText.slice(0, 1000), ttsLang);
       if (synthRes?.audioBuffer) {
         audioBase64 = synthRes.audioBuffer.toString('base64');
         audioContentType = synthRes.contentType || 'audio/wav';
@@ -150,10 +359,18 @@ async function generateDailyBriefing(farm = {}, languageStyle = 'hinglish') {
     },
     metrics: {
       temperature: temp,
+      temperatureMax: maxTemp,
+      temperatureMin: minTemp,
+      humidity,
       rainProbability: rainProb,
+      windSpeed,
       weatherCondition,
       mandiModalPrice: modalPrice,
+      mandiMarketName: marketName,
       mandiTrend: trendDirection,
+      mandiChangePercent: trendChange,
+      mandiMinPrice: minPrice,
+      mandiMaxPrice: maxPrice,
     },
     content: {
       hinglish: hinglishText,

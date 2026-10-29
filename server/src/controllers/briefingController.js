@@ -14,32 +14,32 @@ async function getDailyBriefing(req, res, next) {
     const languageStyle = params.languageStyle || params.language || 'hinglish';
 
     let farm = {
-      crop: params.crop || 'Tomato',
+      crop: params.crop || 'Wheat',
       farmName: params.farmName || 'My Farm',
-      city: params.city || 'Karnal',
-      state: params.state || 'Haryana',
-      latitude: params.latitude ? parseFloat(params.latitude) : 29.6857,
-      longitude: params.longitude ? parseFloat(params.longitude) : 76.9905,
+      city: params.city || 'Indore',
+      state: params.state || 'Madhya Pradesh',
+      latitude: params.latitude ? parseFloat(params.latitude) : null,
+      longitude: params.longitude ? parseFloat(params.longitude) : null,
       area: params.area ? parseFloat(params.area) : 3,
-      cropStage: params.cropStage || 'Vegetative / Growth',
+      cropStage: params.cropStage || 'Vegetative Growth',
     };
 
-    // If user is authenticated and DB is connected, fetch their primary farm profile
+    // If user is authenticated and DB is connected, merge their primary farm profile
     if (req.userId && isDBConnected() && !params.forceParams) {
       try {
         const userFarm = await Farm.findOne({ userId: req.userId }).sort({ updatedAt: -1 });
         if (userFarm) {
           farm = {
-            crop: userFarm.crop || farm.crop,
-            farmName: userFarm.farmName || farm.farmName,
-            city: userFarm.location?.city || farm.city,
-            state: userFarm.location?.state || farm.state,
-            latitude: userFarm.latitude || farm.latitude,
-            longitude: userFarm.longitude || farm.longitude,
-            area: userFarm.area || farm.area,
-            cropStage: userFarm.cropStage || farm.cropStage,
+            crop: params.crop || userFarm.crop || farm.crop,
+            farmName: params.farmName || userFarm.farmName || farm.farmName,
+            city: params.city || userFarm.location?.city || farm.city,
+            state: params.state || userFarm.location?.state || farm.state,
+            latitude: params.latitude ? parseFloat(params.latitude) : (userFarm.latitude || farm.latitude),
+            longitude: params.longitude ? parseFloat(params.longitude) : (userFarm.longitude || farm.longitude),
+            area: params.area ? parseFloat(params.area) : (userFarm.area || farm.area),
+            cropStage: params.cropStage || userFarm.cropStage || farm.cropStage,
           };
-          logger.info(`[Daily Briefing] Loaded farm profile for user ${req.userId}: ${farm.farmName} (${farm.crop})`);
+          logger.info(`[Daily Briefing] Loaded farm profile for user ${req.userId}: ${farm.farmName} (${farm.crop}) in ${farm.city}`);
         }
       } catch (dbErr) {
         logger.warn('[Daily Briefing] DB farm lookup failed, using fallback farm:', dbErr.message);

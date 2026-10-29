@@ -28,11 +28,16 @@ export default function DailyBriefingCard({ farm }: DailyBriefingCardProps) {
   const loadBriefing = async (style: 'hinglish' | 'hindi' | 'english' = activeStyle) => {
     setLoading(true);
     try {
+      const city = farm?.city || (farm as any)?.location?.city || 'Indore';
+      const state = farm?.state || (farm as any)?.location?.state || 'Madhya Pradesh';
       const res = await briefingApi.getDailyBriefing({
-        crop: farm?.crop || 'Tomato',
+        crop: farm?.crop || 'Wheat',
         farmName: farm?.farmName || 'My Farm',
-        city: farm?.city || 'Karnal',
-        state: farm?.state || 'Haryana',
+        city,
+        state,
+        latitude: farm?.latitude,
+        longitude: farm?.longitude,
+        cropStage: farm?.cropStage || 'Vegetative Growth',
         languageStyle: style,
       });
       if (res?.data) {
@@ -196,11 +201,16 @@ export default function DailyBriefingCard({ farm }: DailyBriefingCardProps) {
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
           {briefing?.metrics && (
             <>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-xl border border-amber-200/80 text-xs font-semibold text-amber-900">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-xl border border-amber-200/80 text-xs font-semibold text-amber-900" title={`Market: ${briefing.metrics.mandiMarketName || 'Local Mandi'}`}>
                 <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
-                <span>₹{briefing.metrics.mandiModalPrice}/q</span>
+                <span>₹{briefing.metrics.mandiModalPrice?.toLocaleString('en-IN')}/q</span>
+                {briefing.metrics.mandiMarketName && (
+                  <span className="text-[10px] text-amber-700 bg-amber-100/80 px-1.5 py-0.2 rounded font-normal">
+                    {briefing.metrics.mandiMarketName}
+                  </span>
+                )}
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 rounded-xl border border-blue-200/80 text-xs font-semibold text-blue-900">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 rounded-xl border border-blue-200/80 text-xs font-semibold text-blue-900" title={`Sky: ${briefing.metrics.weatherCondition || 'Clear'}, Humidity: ${briefing.metrics.humidity || 55}%`}>
                 <CloudRain className="w-3.5 h-3.5 text-blue-600" />
                 <span>{briefing.metrics.temperature}°C ({briefing.metrics.rainProbability}% rain)</span>
               </div>

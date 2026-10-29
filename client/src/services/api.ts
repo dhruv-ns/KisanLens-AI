@@ -273,6 +273,9 @@ export const briefingApi = {
     farmName?: string;
     city?: string;
     state?: string;
+    latitude?: number;
+    longitude?: number;
+    cropStage?: string;
     languageStyle?: 'hinglish' | 'hindi' | 'english';
   }) => {
     const res = await api.post('/briefing/daily', params || {});
